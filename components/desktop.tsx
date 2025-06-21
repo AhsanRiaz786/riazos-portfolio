@@ -168,6 +168,16 @@ function MatrixRain() {
 export default function Desktop() {
   const [openWindows, setOpenWindows] = useState<string[]>([])
   const [activeWindow, setActiveWindow] = useState<string | null>(null)
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  // Update clock every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
 
   const openWindow = (windowId: string) => {
     if (!openWindows.includes(windowId)) {
@@ -222,7 +232,7 @@ export default function Desktop() {
 
       {/* System Info */}
       <div className="absolute top-4 right-4 text-[#00FF41] font-mono text-sm z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
-        <div>{new Date().toLocaleTimeString()}</div>
+        <div>{currentTime.toLocaleTimeString()}</div>
       </div>
 
       <div className="absolute bottom-4 right-4 text-[#00FF41] font-mono text-xs opacity-60 z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
