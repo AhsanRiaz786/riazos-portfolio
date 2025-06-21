@@ -11,7 +11,14 @@ import {
   Monitor,
   Code,
   History,
-  Mail
+  Mail,
+  RefreshCw,
+  Settings,
+  Info,
+  Folder,
+  Image,
+  Palette,
+  MousePointer
 } from "lucide-react"
 import DesktopIcon from "./desktop-icon"
 import Window from "./window"
@@ -33,6 +40,12 @@ interface RainDrop {
   char: string
   opacity: number
   trail: Array<{ char: string; opacity: number }>
+}
+
+interface ContextMenu {
+  visible: boolean
+  x: number
+  y: number
 }
 
 const desktopIcons = [
@@ -165,10 +178,91 @@ function MatrixRain() {
   )
 }
 
+function DesktopContextMenu({ contextMenu, onClose, onAction }: {
+  contextMenu: ContextMenu
+  onClose: () => void
+  onAction: (action: string) => void
+}) {
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    if (contextMenu.visible) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [contextMenu.visible, onClose])
+
+  if (!contextMenu.visible) return null
+
+  const menuItems = [
+    { icon: <RefreshCw size={16} />, label: "Refresh Desktop", action: "refresh" },
+    { icon: <Folder size={16} />, label: "New Folder", action: "new-folder", disabled: true },
+    { icon: <Image size={16} />, label: "Set Wallpaper", action: "wallpaper", disabled: true },
+    "separator",
+    { icon: <TerminalIcon size={16} />, label: "Open Terminal", action: "terminal" },
+    { icon: <Activity size={16} />, label: "Process Manager", action: "process-manager" },
+    "separator",
+    { icon: <Palette size={16} />, label: "Personalize", action: "personalize", disabled: true },
+    { icon: <Settings size={16} />, label: "Desktop Settings", action: "settings", disabled: true },
+    "separator",
+    { icon: <Info size={16} />, label: "About RIAZ.OS", action: "about" },
+  ]
+
+  return (
+    <div
+      ref={menuRef}
+      className="fixed bg-[#1a1a1a] border border-[#00FF41] border-opacity-30 rounded-md shadow-lg py-1 z-50 min-w-[200px]"
+      style={{
+        left: contextMenu.x,
+        top: contextMenu.y,
+        transform: `translate(${contextMenu.x + 200 > window.innerWidth ? '-100%' : '0'}, ${contextMenu.y + 300 > window.innerHeight ? '-100%' : '0'})`
+      }}
+    >
+      {menuItems.map((item, index) => {
+        if (item === "separator") {
+          return (
+            <div key={index} className="h-px bg-[#00FF41] bg-opacity-20 my-1 mx-2" />
+          )
+        }
+
+        const menuItem = item as { icon: React.ReactNode; label: string; action: string; disabled?: boolean }
+        
+        return (
+          <button
+            key={index}
+            onClick={() => {
+              if (!menuItem.disabled) {
+                onAction(menuItem.action)
+                onClose()
+              }
+            }}
+            disabled={menuItem.disabled}
+            className={`w-full flex items-center px-3 py-2 text-sm font-mono transition-colors ${
+              menuItem.disabled 
+                ? 'text-gray-500 cursor-not-allowed' 
+                : 'text-[#00FF41] hover:bg-[#00FF41] hover:bg-opacity-10 hover:text-white cursor-pointer'
+            }`}
+          >
+            <span className="mr-3">{menuItem.icon}</span>
+            {menuItem.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function Desktop() {
   const [openWindows, setOpenWindows] = useState<string[]>([])
   const [activeWindow, setActiveWindow] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [contextMenu, setContextMenu] = useState<ContextMenu>({ visible: false, x: 0, y: 0 })
 
   // Update clock every second
   useEffect(() => {
@@ -194,6 +288,38 @@ export default function Desktop() {
     }
   }
 
+  const handleRightClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY
+    })
+  }
+
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0 })
+  }
+
+  const handleContextAction = (action: string) => {
+    switch (action) {
+      case "refresh":
+        window.location.reload()
+        break
+      case "terminal":
+        openWindow("terminal")
+        break
+      case "process-manager":
+        openWindow("process-manager")
+        break
+      case "about":
+        alert("RIAZ.OS v2024.12\nBuilt Different\n\nA portfolio operating system experience\nDeveloped by Ahsan Riaz")
+        break
+      default:
+        console.log(`Action: ${action}`)
+    }
+  }
+
   const renderWindowContent = (windowId: string) => {
     switch (windowId) {
       case "process-manager":
@@ -214,7 +340,10 @@ export default function Desktop() {
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <div 
+      className="min-h-screen bg-black relative overflow-hidden"
+      onContextMenu={handleRightClick}
+    >
       {/* Matrix Rain Background */}
       <MatrixRain />
 
@@ -238,6 +367,13 @@ export default function Desktop() {
       <div className="absolute bottom-4 right-4 text-[#00FF41] font-mono text-xs opacity-60 z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
         RIAZ.OS v2024.12
       </div>
+
+      {/* Context Menu */}
+      <DesktopContextMenu 
+        contextMenu={contextMenu}
+        onClose={closeContextMenu}
+        onAction={handleContextAction}
+      />
 
       {/* Windows */}
       {openWindows.map((windowId) => {
