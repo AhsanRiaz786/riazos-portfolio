@@ -18,7 +18,20 @@ import {
   Folder,
   Image,
   Palette,
-  MousePointer
+  MousePointer,
+  Menu,
+  Power,
+  User,
+  HardDrive,
+  Wifi,
+  Volume2,
+  Battery,
+  Bell,
+  Search,
+  Grid3X3,
+  LogOut,
+  RotateCcw,
+  Download
 } from "lucide-react"
 import DesktopIcon from "./desktop-icon"
 import Window from "./window"
@@ -258,11 +271,173 @@ function DesktopContextMenu({ contextMenu, onClose, onAction }: {
   )
 }
 
+function StartMenu({ isOpen, onClose, onAction }: {
+  isOpen: boolean
+  onClose: () => void
+  onAction: (action: string) => void
+}) {
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
+  const quickActions = [
+    { icon: <TerminalIcon size={18} />, label: "Terminal", action: "terminal" },
+    { icon: <Activity size={18} />, label: "Process Manager", action: "process-manager" },
+    { icon: <FolderOpen size={18} />, label: "Tech Stack", action: "tech-stack" },
+    { icon: <History size={18} />, label: "Chronos", action: "chronos" },
+    { icon: <FileText size={18} />, label: "README", action: "readme" },
+    { icon: <Shield size={18} />, label: "Contact", action: "contact" },
+  ]
+
+  const systemActions = [
+    { icon: <Settings size={18} />, label: "Settings", action: "settings", disabled: true },
+    { icon: <HardDrive size={18} />, label: "File Manager", action: "file-manager", disabled: true },
+    { icon: <Search size={18} />, label: "Search", action: "search", disabled: true },
+    "separator",
+    { icon: <RotateCcw size={18} />, label: "Restart", action: "restart" },
+    { icon: <Power size={18} />, label: "Shutdown", action: "shutdown" },
+  ]
+
+  return (
+    <div
+      ref={menuRef}
+      className="fixed bottom-12 left-4 bg-[#1a1a1a] border border-[#00FF41] border-opacity-30 rounded-lg shadow-xl p-4 z-50 w-80"
+    >
+      {/* User Info */}
+      <div className="flex items-center mb-4 p-3 bg-[#00FF41] bg-opacity-10 rounded-lg">
+        <div className="w-10 h-10 bg-[#00FF41] bg-opacity-20 rounded-full flex items-center justify-center mr-3">
+          <User size={20} className="text-[#00FF41]" />
+        </div>
+        <div>
+          <div className="text-[#00FF41] font-mono font-bold">Ahsan Riaz</div>
+          <div className="text-gray-400 text-xs font-mono">Developer</div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-4">
+        <div className="text-[#00FF41] text-xs font-mono mb-2 opacity-70">QUICK ACCESS</div>
+        <div className="grid grid-cols-2 gap-2">
+          {quickActions.map((action, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                onAction(action.action)
+                onClose()
+              }}
+              className="flex items-center p-2 rounded-md hover:bg-[#00FF41] hover:bg-opacity-10 transition-colors text-left"
+            >
+              <span className="text-[#00FF41] mr-2">{action.icon}</span>
+              <span className="text-[#00FF41] text-sm font-mono truncate">{action.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* System Actions */}
+      <div>
+        <div className="text-[#00FF41] text-xs font-mono mb-2 opacity-70">SYSTEM</div>
+        {systemActions.map((action, index) => {
+          if (action === "separator") {
+            return (
+              <div key={index} className="h-px bg-[#00FF41] bg-opacity-20 my-2" />
+            )
+          }
+
+          const systemAction = action as { icon: React.ReactNode; label: string; action: string; disabled?: boolean }
+          
+          return (
+            <button
+              key={index}
+              onClick={() => {
+                if (!systemAction.disabled) {
+                  onAction(systemAction.action)
+                  onClose()
+                }
+              }}
+              disabled={systemAction.disabled}
+              className={`w-full flex items-center p-2 rounded-md transition-colors text-left ${
+                systemAction.disabled 
+                  ? 'text-gray-500 cursor-not-allowed' 
+                  : 'text-[#00FF41] hover:bg-[#00FF41] hover:bg-opacity-10'
+              }`}
+            >
+              <span className="mr-3">{systemAction.icon}</span>
+              <span className="text-sm font-mono">{systemAction.label}</span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function SystemTray({ currentTime }: { currentTime: Date }) {
+  const [notifications, setNotifications] = useState(0)
+
+  useEffect(() => {
+    // Simulate occasional notifications
+    const notificationTimer = setInterval(() => {
+      if (Math.random() > 0.95) {
+        setNotifications(prev => prev + 1)
+      }
+    }, 5000)
+
+    return () => clearInterval(notificationTimer)
+  }, [])
+
+  const clearNotifications = () => setNotifications(0)
+
+  return (
+    <div className="flex items-center space-x-2 text-[#00FF41]">
+      {/* System Status Icons */}
+      <div className="flex items-center space-x-1">
+        <Wifi size={16} className="opacity-80" />
+        <Volume2 size={16} className="opacity-80" />
+        <Battery size={16} className="opacity-80" />
+      </div>
+
+      {/* Notifications */}
+      {notifications > 0 && (
+        <button
+          onClick={clearNotifications}
+          className="relative hover:bg-[#00FF41] hover:bg-opacity-10 p-1 rounded"
+        >
+          <Bell size={16} />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            {notifications}
+          </span>
+        </button>
+      )}
+
+      {/* Date and Time */}
+      <div className="text-right">
+        <div className="text-xs font-mono">{currentTime.toLocaleDateString()}</div>
+        <div className="text-sm font-mono">{currentTime.toLocaleTimeString()}</div>
+      </div>
+    </div>
+  )
+}
+
 export default function Desktop() {
   const [openWindows, setOpenWindows] = useState<string[]>([])
   const [activeWindow, setActiveWindow] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [contextMenu, setContextMenu] = useState<ContextMenu>({ visible: false, x: 0, y: 0 })
+  const [startMenuOpen, setStartMenuOpen] = useState(false)
 
   // Update clock every second
   useEffect(() => {
@@ -320,6 +495,31 @@ export default function Desktop() {
     }
   }
 
+  const handleStartMenuAction = (action: string) => {
+    switch (action) {
+      case "terminal":
+      case "process-manager":
+      case "tech-stack":
+      case "chronos":
+      case "readme":
+      case "contact":
+        openWindow(action)
+        break
+      case "restart":
+        if (confirm("Are you sure you want to restart RIAZ.OS?")) {
+          window.location.reload()
+        }
+        break
+      case "shutdown":
+        if (confirm("Are you sure you want to shutdown RIAZ.OS?")) {
+          window.close()
+        }
+        break
+      default:
+        console.log(`Start menu action: ${action}`)
+    }
+  }
+
   const renderWindowContent = (windowId: string) => {
     switch (windowId) {
       case "process-manager":
@@ -359,11 +559,7 @@ export default function Desktop() {
         ))}
       </div>
 
-      {/* System Info */}
-      <div className="absolute top-4 right-4 text-[#00FF41] font-mono text-sm z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
-        <div>{currentTime.toLocaleTimeString()}</div>
-      </div>
-
+      {/* System Info - Simplified since we have system tray now */}
       <div className="absolute bottom-4 right-4 text-[#00FF41] font-mono text-xs opacity-60 z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
         RIAZ.OS v2024.12
       </div>
@@ -373,6 +569,13 @@ export default function Desktop() {
         contextMenu={contextMenu}
         onClose={closeContextMenu}
         onAction={handleContextAction}
+      />
+
+      {/* Start Menu */}
+      <StartMenu 
+        isOpen={startMenuOpen}
+        onClose={() => setStartMenuOpen(false)}
+        onAction={handleStartMenuAction}
       />
 
       {/* Windows */}
@@ -391,24 +594,40 @@ export default function Desktop() {
         )
       })}
 
-      {/* Taskbar */}
-      <div className="fixed bottom-0 left-0 right-0 h-12 bg-[#141414] bg-opacity-80 backdrop-blur-sm border-t border-[#00FF41] border-opacity-30 flex items-center px-4 z-20">
-        <div className="flex space-x-2">
+      {/* Enhanced Taskbar */}
+      <div className="fixed bottom-0 left-0 right-0 h-14 bg-[#141414] bg-opacity-90 backdrop-blur-sm border-t border-[#00FF41] border-opacity-30 flex items-center px-4 z-20">
+        {/* Start Button */}
+        <button
+          onClick={() => setStartMenuOpen(!startMenuOpen)}
+          className={`flex items-center px-4 py-2 rounded-md mr-4 transition-colors font-mono ${
+            startMenuOpen ? "bg-[#00FF41] text-black" : "bg-[#333] text-[#00FF41] hover:bg-[#444]"
+          }`}
+        >
+          <Grid3X3 size={18} className="mr-2" />
+          <span className="text-sm">START</span>
+        </button>
+
+        {/* Window List */}
+        <div className="flex space-x-2 flex-1">
           {openWindows.map((windowId) => {
             const icon = desktopIcons.find((i) => i.id === windowId)
             return (
               <button
                 key={windowId}
                 onClick={() => setActiveWindow(windowId)}
-                className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
+                className={`px-3 py-2 rounded text-xs font-mono transition-colors max-w-32 truncate ${
                   activeWindow === windowId ? "bg-[#00FF41] text-black" : "bg-[#333] text-[#00FF41] hover:bg-[#444]"
                 }`}
+                title={icon?.label}
               >
                 {icon?.label}
               </button>
             )
           })}
         </div>
+
+        {/* System Tray */}
+        <SystemTray currentTime={currentTime} />
       </div>
     </div>
   )
