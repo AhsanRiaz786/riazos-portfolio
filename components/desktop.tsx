@@ -31,7 +31,24 @@ import {
   Grid3X3,
   LogOut,
   RotateCcw,
-  Download
+  Download,
+  Cpu,
+  MemoryStick,
+  Network,
+  Cloud,
+  Sun,
+  CloudRain,
+  Music,
+  Play,
+  Pause,
+  SkipForward,
+  TrendingUp,
+  DollarSign,
+  Bitcoin,
+  StickyNote,
+  X,
+  Maximize2,
+  Minimize2
 } from "lucide-react"
 import DesktopIcon from "./desktop-icon"
 import Window from "./window"
@@ -59,6 +76,15 @@ interface ContextMenu {
   visible: boolean
   x: number
   y: number
+}
+
+interface Widget {
+  id: string
+  name: string
+  component: React.ComponentType
+  defaultPosition: { x: number; y: number }
+  size: { width: number; height: number }
+  visible: boolean
 }
 
 const desktopIcons = [
@@ -191,6 +217,326 @@ function MatrixRain() {
   )
 }
 
+function SystemMonitorWidget() {
+  const [stats, setStats] = useState({
+    cpu: 0,
+    ram: 0,
+    network: 0
+  })
+
+  useEffect(() => {
+    const updateStats = () => {
+      setStats({
+        cpu: Math.floor(Math.random() * 100),
+        ram: Math.floor(Math.random() * 100),
+        network: Math.floor(Math.random() * 1000)
+      })
+    }
+
+    updateStats()
+    const interval = setInterval(updateStats, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center space-x-2">
+        <Cpu size={16} className="text-[#00FF41]" />
+        <div className="flex-1">
+          <div className="flex justify-between text-xs">
+            <span>CPU</span>
+            <span>{stats.cpu}%</span>
+          </div>
+          <div className="w-full bg-gray-700 h-2 rounded">
+            <div 
+              className="bg-[#00FF41] h-2 rounded transition-all duration-500"
+              style={{ width: `${stats.cpu}%` }}
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <MemoryStick size={16} className="text-[#00FF41]" />
+        <div className="flex-1">
+          <div className="flex justify-between text-xs">
+            <span>RAM</span>
+            <span>{stats.ram}%</span>
+          </div>
+          <div className="w-full bg-gray-700 h-2 rounded">
+            <div 
+              className="bg-[#00FF41] h-2 rounded transition-all duration-500"
+              style={{ width: `${stats.ram}%` }}
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <Network size={16} className="text-[#00FF41]" />
+        <div className="flex-1">
+          <div className="flex justify-between text-xs">
+            <span>NET</span>
+            <span>{stats.network} KB/s</span>
+          </div>
+          <div className="w-full bg-gray-700 h-2 rounded">
+            <div 
+              className="bg-[#00FF41] h-2 rounded transition-all duration-500"
+              style={{ width: `${Math.min(stats.network / 10, 100)}%` }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function WeatherWidget() {
+  const [weather, setWeather] = useState({
+    temp: 22,
+    condition: 'clear',
+    humidity: 45,
+    wind: 12
+  })
+
+  useEffect(() => {
+    const updateWeather = () => {
+      const conditions = ['clear', 'cloudy', 'rain']
+      setWeather({
+        temp: Math.floor(Math.random() * 30) + 10,
+        condition: conditions[Math.floor(Math.random() * conditions.length)],
+        humidity: Math.floor(Math.random() * 100),
+        wind: Math.floor(Math.random() * 30)
+      })
+    }
+
+    const interval = setInterval(updateWeather, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const getWeatherIcon = () => {
+    switch (weather.condition) {
+      case 'clear': return <Sun size={24} className="text-yellow-400" />
+      case 'cloudy': return <Cloud size={24} className="text-gray-400" />
+      case 'rain': return <CloudRain size={24} className="text-blue-400" />
+      default: return <Sun size={24} className="text-yellow-400" />
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center space-x-3">
+        {getWeatherIcon()}
+        <div>
+          <div className="text-2xl font-bold">{weather.temp}°C</div>
+          <div className="text-xs text-gray-400 capitalize">{weather.condition}</div>
+        </div>
+      </div>
+      
+      <div className="space-y-1 text-xs">
+        <div className="flex justify-between">
+          <span>Humidity</span>
+          <span>{weather.humidity}%</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Wind</span>
+          <span>{weather.wind} km/h</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Location</span>
+          <span>Matrix City</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MusicWidget() {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTrack, setCurrentTrack] = useState({
+    title: "Digital Dreams",
+    artist: "Neo & The Machines",
+    duration: "3:42"
+  })
+
+  const tracks = [
+    { title: "Digital Dreams", artist: "Neo & The Machines", duration: "3:42" },
+    { title: "Code Runner", artist: "Binary Beats", duration: "4:15" },
+    { title: "Matrix Flow", artist: "Cyber Symphony", duration: "2:58" },
+    { title: "Electron Dance", artist: "Quantum Waves", duration: "3:33" }
+  ]
+
+  const nextTrack = () => {
+    const currentIndex = tracks.findIndex(t => t.title === currentTrack.title)
+    const nextIndex = (currentIndex + 1) % tracks.length
+    setCurrentTrack(tracks[nextIndex])
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center space-x-2">
+        <Music size={16} className="text-[#00FF41]" />
+        <span className="text-xs">NOW PLAYING</span>
+      </div>
+      
+      <div className="space-y-1">
+        <div className="text-sm font-bold truncate">{currentTrack.title}</div>
+        <div className="text-xs text-gray-400 truncate">{currentTrack.artist}</div>
+        <div className="text-xs text-gray-500">{currentTrack.duration}</div>
+      </div>
+      
+      <div className="flex justify-center space-x-3">
+        <button
+          onClick={() => setIsPlaying(!isPlaying)}
+          className="p-2 bg-[#00FF41] bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+        >
+          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+        </button>
+        <button
+          onClick={nextTrack}
+          className="p-2 bg-[#00FF41] bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+        >
+          <SkipForward size={16} />
+        </button>
+      </div>
+      
+      {/* Simple visualizer */}
+      {isPlaying && (
+        <div className="flex justify-center space-x-1">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-1 bg-[#00FF41] rounded animate-pulse"
+              style={{
+                height: `${Math.random() * 20 + 10}px`,
+                animationDelay: `${i * 100}ms`,
+                animationDuration: `${500 + Math.random() * 1000}ms`
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CryptoWidget() {
+  const [crypto, setCrypto] = useState([
+    { symbol: 'BTC', price: 45230.50, change: 2.3 },
+    { symbol: 'ETH', price: 3024.75, change: -1.2 },
+    { symbol: 'SOL', price: 98.42, change: 5.7 }
+  ])
+
+  useEffect(() => {
+    const updatePrices = () => {
+      setCrypto(prev => prev.map(coin => ({
+        ...coin,
+        price: coin.price + (Math.random() - 0.5) * coin.price * 0.05,
+        change: (Math.random() - 0.5) * 10
+      })))
+    }
+
+    const interval = setInterval(updatePrices, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center space-x-2 mb-3">
+        <Bitcoin size={16} className="text-[#00FF41]" />
+        <span className="text-xs">CRYPTO TRACKER</span>
+      </div>
+      
+      {crypto.map((coin) => (
+        <div key={coin.symbol} className="flex justify-between items-center">
+          <div>
+            <div className="text-sm font-bold">{coin.symbol}</div>
+            <div className="text-xs text-gray-400">
+              ${coin.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </div>
+          </div>
+          <div className={`text-xs flex items-center space-x-1 ${
+            coin.change >= 0 ? 'text-green-400' : 'text-red-400'
+          }`}>
+            <TrendingUp size={12} className={coin.change < 0 ? 'rotate-180' : ''} />
+            <span>{coin.change >= 0 ? '+' : ''}{coin.change.toFixed(1)}%</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function DesktopWidget({ widget, onClose }: { widget: Widget; onClose: () => void }) {
+  const [position, setPosition] = useState(widget.defaultPosition)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true)
+    setDragOffset({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    })
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        setPosition({
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y
+        })
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+    }
+  }, [isDragging, dragOffset])
+
+  return (
+    <div
+      className="fixed bg-[#1a1a1a] bg-opacity-95 border border-[#00FF41] border-opacity-30 rounded-lg shadow-xl z-30"
+      style={{
+        left: position.x,
+        top: position.y,
+        width: widget.size.width,
+        height: widget.size.height,
+        cursor: isDragging ? 'grabbing' : 'default'
+      }}
+    >
+      {/* Widget Header */}
+      <div
+        className="flex items-center justify-between p-2 border-b border-[#00FF41] border-opacity-20 cursor-grab active:cursor-grabbing"
+        onMouseDown={handleMouseDown}
+      >
+        <span className="text-[#00FF41] text-xs font-mono font-bold">{widget.name}</span>
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-red-400 transition-colors"
+        >
+          <X size={14} />
+        </button>
+      </div>
+      
+      {/* Widget Content */}
+      <div className="p-3 text-[#00FF41] font-mono text-sm">
+        <widget.component />
+      </div>
+    </div>
+  )
+}
+
 function DesktopContextMenu({ contextMenu, onClose, onAction }: {
   contextMenu: ContextMenu
   onClose: () => void
@@ -218,6 +564,11 @@ function DesktopContextMenu({ contextMenu, onClose, onAction }: {
     { icon: <Folder size={16} />, label: "New Folder", action: "new-folder", disabled: true },
     { icon: <Image size={16} />, label: "Set Wallpaper", action: "wallpaper", disabled: true },
     "separator",
+    { icon: <Monitor size={16} />, label: "System Monitor", action: "widget-system" },
+    { icon: <Cloud size={16} />, label: "Weather Widget", action: "widget-weather" },
+    { icon: <Music size={16} />, label: "Music Player", action: "widget-music" },
+    { icon: <Bitcoin size={16} />, label: "Crypto Tracker", action: "widget-crypto" },
+    "separator",
     { icon: <TerminalIcon size={16} />, label: "Open Terminal", action: "terminal" },
     { icon: <Activity size={16} />, label: "Process Manager", action: "process-manager" },
     "separator",
@@ -234,7 +585,7 @@ function DesktopContextMenu({ contextMenu, onClose, onAction }: {
       style={{
         left: contextMenu.x,
         top: contextMenu.y,
-        transform: `translate(${contextMenu.x + 200 > window.innerWidth ? '-100%' : '0'}, ${contextMenu.y + 300 > window.innerHeight ? '-100%' : '0'})`
+        transform: `translate(${contextMenu.x + 200 > window.innerWidth ? '-100%' : '0'}, ${contextMenu.y + 400 > window.innerHeight ? '-100%' : '0'})`
       }}
     >
       {menuItems.map((item, index) => {
@@ -438,6 +789,40 @@ export default function Desktop() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [contextMenu, setContextMenu] = useState<ContextMenu>({ visible: false, x: 0, y: 0 })
   const [startMenuOpen, setStartMenuOpen] = useState(false)
+  const [widgets, setWidgets] = useState<Widget[]>([
+    {
+      id: 'system-monitor',
+      name: 'SYSTEM_MONITOR',
+      component: SystemMonitorWidget,
+      defaultPosition: { x: window.innerWidth - 250, y: 80 },
+      size: { width: 220, height: 180 },
+      visible: false
+    },
+    {
+      id: 'weather',
+      name: 'WEATHER_STATION',
+      component: WeatherWidget,
+      defaultPosition: { x: window.innerWidth - 250, y: 280 },
+      size: { width: 220, height: 160 },
+      visible: false
+    },
+    {
+      id: 'music',
+      name: 'MUSIC_PLAYER',
+      component: MusicWidget,
+      defaultPosition: { x: window.innerWidth - 250, y: 460 },
+      size: { width: 220, height: 200 },
+      visible: false
+    },
+    {
+      id: 'crypto',
+      name: 'CRYPTO_TRACKER',
+      component: CryptoWidget,
+      defaultPosition: { x: window.innerWidth - 480, y: 80 },
+      size: { width: 200, height: 180 },
+      visible: false
+    }
+  ])
 
   // Update clock every second
   useEffect(() => {
@@ -463,6 +848,22 @@ export default function Desktop() {
     }
   }
 
+  const toggleWidget = (widgetId: string) => {
+    setWidgets(prev => prev.map(widget => 
+      widget.id === widgetId 
+        ? { ...widget, visible: !widget.visible }
+        : widget
+    ))
+  }
+
+  const closeWidget = (widgetId: string) => {
+    setWidgets(prev => prev.map(widget => 
+      widget.id === widgetId 
+        ? { ...widget, visible: false }
+        : widget
+    ))
+  }
+
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault()
     setContextMenu({
@@ -486,6 +887,18 @@ export default function Desktop() {
         break
       case "process-manager":
         openWindow("process-manager")
+        break
+      case "widget-system":
+        toggleWidget("system-monitor")
+        break
+      case "widget-weather":
+        toggleWidget("weather")
+        break
+      case "widget-music":
+        toggleWidget("music")
+        break
+      case "widget-crypto":
+        toggleWidget("crypto")
         break
       case "about":
         alert("RIAZ.OS v2024.12\nBuilt Different\n\nA portfolio operating system experience\nDeveloped by Ahsan Riaz")
@@ -558,6 +971,15 @@ export default function Desktop() {
           />
         ))}
       </div>
+
+      {/* Desktop Widgets */}
+      {widgets.filter(widget => widget.visible).map((widget) => (
+        <DesktopWidget
+          key={widget.id}
+          widget={widget}
+          onClose={() => closeWidget(widget.id)}
+        />
+      ))}
 
       {/* System Info - Simplified since we have system tray now */}
       <div className="absolute bottom-4 right-4 text-[#00FF41] font-mono text-xs opacity-60 z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
