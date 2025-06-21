@@ -22,9 +22,9 @@ cat [filename]        - Display file contents
 easter_egg            - Find the hidden surprise`,
 
   about: `NAME: Ahsan Riaz
-ROLE: Full-Stack Developer & Problem Solver
-LOCATION: Islamabad, Pakistan
-EDUCATION: BSCS at NUST (CGPA: 3.26/4.00)
+ROLE: Full-Stack Developer & Automation Engineer
+LOCATION: Faisalabad/Islamabad, Pakistan
+EDUCATION: BSCS Sophomore at NUST 
 
 I'm a developer who enjoys turning messy problems into clean solutions. 
 Whether it's scraping data from stubborn websites or building user 
@@ -79,14 +79,17 @@ Use 'cat project_[number].log' for detailed case studies`,
 
   experience: `PROFESSIONAL_TIMELINE:
 
-2021-09 → Started BSCS at NUST
-2022-03 → Built first web scraper
-2022-08 → Discovered React development
-2023-01 → First Upwork client ($200 project)
-2023-06 → Launched freelance career
+2021-07 → Started ICS at Punjab Group of Colleges
+2022-02 → Wrote Hello World in Python
+2023-04 → Built first web scraper
+2023-06 → Started Upwork
+2023-07 → First Upwork client ($20 project)
+2023-09 → Started BSCS at NUST
 2024-06 → Software Developer Intern at Arbisoft
 2024-07 → Returned to freelancing with new skills
-2024-12 → Top Rated on Upwork, 15+ projects completed
+2024-12 → Top Rated on Upwork
+2025-04 → Started Working on Giraph AI Platform
+2025-06 → Started as a Web Developer at Aawaz AI
 
 Current Status: Building systems that solve real problems`,
 
@@ -134,7 +137,7 @@ CONTACT_PROTOCOLS_AVAILABLE:
     Response Time: < 24 hours
     
 [2] LINKEDIN_NETWORK
-    Profile: /in/ahsan-riaz-dev
+    Profile: https://www.linkedin.com/in/ahsan-riaz-1254992a3
     Protocol: Professional Network
     Connection: Always Open
     
@@ -144,6 +147,7 @@ CONTACT_PROTOCOLS_AVAILABLE:
     Contributions: Daily
     
 [4] UPWORK_PLATFORM
+    Profile: https://www.upwork.com/freelancers/~01d4988598a9368ee5
     Status: Top Rated Freelancer
     Success Rate: 100%
     Availability: Open for Projects
