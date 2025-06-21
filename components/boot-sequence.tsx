@@ -13,7 +13,6 @@ const bootMessages = [
   "> WEB SCRAPING.................[OK]",
   "> AUTOMATION FRAMEWORKS........[OK]",
   "> CLOUD INFRASTRUCTURE.........[OK]",
-  "> PROBLEM-SOLVING ENGINE.......[OK]",
   "",
   "SYSTEM READY.",
   "AHSAN RIAZ: THE BUILDER.",
@@ -22,11 +21,13 @@ const bootMessages = [
   "> _",
 ]
 
-const humanMessages = [
-  "Brewing the perfect cup of code...",
-  "Teaching machines to dance with data...",
-  "Turning coffee into applications...",
-  "Making the complex beautifully simple...",
+const humanMessages = [ 
+  "For me Giving Up is harder than trying", // Champion Kanye West
+  "I didn't find the game, the game found me",
+  "I'm not a businessman, I'm a business, man",
+  "Started from the bottom, now we're here.",
+  "If you don't know, now you know."
+
 ]
 
 export default function BootSequence({ onBootComplete }: BootSequenceProps) {
