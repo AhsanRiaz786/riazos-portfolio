@@ -239,17 +239,17 @@ function SystemMonitorWidget() {
   }, [])
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 h-full flex flex-col justify-center">
       <div className="flex items-center space-x-2">
-        <Cpu size={16} className="text-[#00FF41]" />
-        <div className="flex-1">
-          <div className="flex justify-between text-xs">
-            <span>CPU</span>
-            <span>{stats.cpu}%</span>
+        <Cpu size={14} className="text-[#00FF41] flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-[#00FF41] truncate">CPU</span>
+            <span className="text-white font-bold flex-shrink-0">{stats.cpu}%</span>
           </div>
-          <div className="w-full bg-gray-700 h-2 rounded">
+          <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
             <div 
-              className="bg-[#00FF41] h-2 rounded transition-all duration-500"
+              className="bg-gradient-to-r from-[#00FF41] to-[#00CC33] h-full rounded-full transition-all duration-500 ease-out"
               style={{ width: `${stats.cpu}%` }}
             />
           </div>
@@ -257,15 +257,15 @@ function SystemMonitorWidget() {
       </div>
       
       <div className="flex items-center space-x-2">
-        <MemoryStick size={16} className="text-[#00FF41]" />
-        <div className="flex-1">
-          <div className="flex justify-between text-xs">
-            <span>RAM</span>
-            <span>{stats.ram}%</span>
+        <MemoryStick size={14} className="text-[#00FF41] flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-[#00FF41] truncate">Memory</span>
+            <span className="text-white font-bold flex-shrink-0">{stats.ram}%</span>
           </div>
-          <div className="w-full bg-gray-700 h-2 rounded">
+          <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
             <div 
-              className="bg-[#00FF41] h-2 rounded transition-all duration-500"
+              className="bg-gradient-to-r from-[#00FF41] to-[#00CC33] h-full rounded-full transition-all duration-500 ease-out"
               style={{ width: `${stats.ram}%` }}
             />
           </div>
@@ -273,15 +273,15 @@ function SystemMonitorWidget() {
       </div>
       
       <div className="flex items-center space-x-2">
-        <Network size={16} className="text-[#00FF41]" />
-        <div className="flex-1">
-          <div className="flex justify-between text-xs">
-            <span>NET</span>
-            <span>{stats.network} KB/s</span>
+        <Network size={14} className="text-[#00FF41] flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-[#00FF41] truncate">Network</span>
+            <span className="text-white font-bold flex-shrink-0 text-xs">{stats.network} KB/s</span>
           </div>
-          <div className="w-full bg-gray-700 h-2 rounded">
+          <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
             <div 
-              className="bg-[#00FF41] h-2 rounded transition-all duration-500"
+              className="bg-gradient-to-r from-[#00FF41] to-[#00CC33] h-full rounded-full transition-all duration-500 ease-out"
               style={{ width: `${Math.min(stats.network / 10, 100)}%` }}
             />
           </div>
@@ -293,59 +293,145 @@ function SystemMonitorWidget() {
 
 function WeatherWidget() {
   const [weather, setWeather] = useState({
-    temp: 22,
-    condition: 'clear',
-    humidity: 45,
-    wind: 12
+    temp: null as number | null,
+    condition: 'loading',
+    humidity: null as number | null,
+    wind: null as number | null,
+    location: 'Loading...',
+    loading: true,
+    error: false
   })
 
   useEffect(() => {
-    const updateWeather = () => {
-      const conditions = ['clear', 'cloudy', 'rain']
-      setWeather({
-        temp: Math.floor(Math.random() * 30) + 10,
-        condition: conditions[Math.floor(Math.random() * conditions.length)],
-        humidity: Math.floor(Math.random() * 100),
-        wind: Math.floor(Math.random() * 30)
-      })
+    const fetchWeather = async () => {
+      try {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const { latitude, longitude } = position.coords
+              await getWeatherData(latitude, longitude)
+            },
+            async () => {
+              await getWeatherData(37.7749, -122.4194)
+            }
+          )
+        } else {
+          await getWeatherData(37.7749, -122.4194)
+        }
+      } catch (error) {
+        console.error('Weather fetch error:', error)
+        setWeather(prev => ({ ...prev, loading: false, error: true }))
+      }
     }
 
-    const interval = setInterval(updateWeather, 10000)
+    const getWeatherData = async (lat: number, lon: number) => {
+      try {
+        const response = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relative_humidity_2m,wind_speed_10m&timezone=auto`
+        )
+        
+        if (!response.ok) throw new Error('Weather API failed')
+        
+        const data = await response.json()
+        const current = data.current_weather
+        
+        let locationName = 'Unknown Location'
+        try {
+          const geoResponse = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+          )
+          if (geoResponse.ok) {
+            const geoData = await geoResponse.json()
+            locationName = geoData.city || geoData.locality || geoData.countryName || 'Unknown'
+          }
+        } catch (error) {
+          console.error('Geocoding error:', error)
+        }
+
+        setWeather({
+          temp: Math.round(current.temperature),
+          condition: getConditionFromCode(current.weathercode),
+          humidity: Math.round(data.hourly.relative_humidity_2m[0] || 50),
+          wind: Math.round(current.windspeed),
+          location: locationName,
+          loading: false,
+          error: false
+        })
+      } catch (error) {
+        console.error('Weather data error:', error)
+        setWeather(prev => ({ ...prev, loading: false, error: true }))
+      }
+    }
+
+    fetchWeather()
+    const interval = setInterval(fetchWeather, 10 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
+  const getConditionFromCode = (code: number): string => {
+    if (code === 0) return 'clear'
+    if (code <= 3) return 'cloudy'
+    if (code <= 67) return 'rain'
+    if (code <= 77) return 'snow'
+    if (code <= 82) return 'rain'
+    return 'cloudy'
+  }
+
   const getWeatherIcon = () => {
+    if (weather.loading) return <Clock size={24} className="text-gray-400 animate-spin" />
+    if (weather.error) return <X size={24} className="text-red-400" />
+    
     switch (weather.condition) {
       case 'clear': return <Sun size={24} className="text-yellow-400" />
       case 'cloudy': return <Cloud size={24} className="text-gray-400" />
       case 'rain': return <CloudRain size={24} className="text-blue-400" />
+      case 'snow': return <Cloud size={24} className="text-blue-200" />
       default: return <Sun size={24} className="text-yellow-400" />
     }
   }
 
+  if (weather.loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <Clock size={24} className="text-[#00FF41] animate-spin mb-2" />
+        <div className="text-[#00FF41] font-bold text-xs">Loading...</div>
+      </div>
+    )
+  }
+
+  if (weather.error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <X size={24} className="text-red-400 mb-2" />
+        <div className="text-red-400 font-bold text-xs">Error</div>
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 h-full flex flex-col">
       <div className="flex items-center space-x-3">
         {getWeatherIcon()}
-        <div>
-          <div className="text-2xl font-bold">{weather.temp}°C</div>
-          <div className="text-xs text-gray-400 capitalize">{weather.condition}</div>
+        <div className="flex-1 min-w-0">
+          <div className="text-2xl font-bold text-white">{weather.temp}°</div>
+          <div className="text-xs text-gray-400 capitalize truncate">{weather.condition}</div>
         </div>
       </div>
       
-      <div className="space-y-1 text-xs">
-        <div className="flex justify-between">
-          <span>Humidity</span>
-          <span>{weather.humidity}%</span>
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="bg-gray-800 bg-opacity-50 rounded p-2">
+          <div className="text-gray-400 text-xs">Humidity</div>
+          <div className="text-[#00FF41] font-bold truncate">{weather.humidity}%</div>
         </div>
-        <div className="flex justify-between">
-          <span>Wind</span>
-          <span>{weather.wind} km/h</span>
+        <div className="bg-gray-800 bg-opacity-50 rounded p-2">
+          <div className="text-gray-400 text-xs">Wind</div>
+          <div className="text-[#00FF41] font-bold truncate">{weather.wind} km/h</div>
         </div>
-        <div className="flex justify-between">
-          <span>Location</span>
-          <span>Matrix City</span>
-        </div>
+      </div>
+      
+      <div className="text-center flex-1 flex flex-col justify-end">
+        <div className="text-xs text-gray-400">Location</div>
+        <div className="text-[#00FF41] font-bold text-xs truncate">{weather.location}</div>
       </div>
     </div>
   )
@@ -363,7 +449,9 @@ function MusicWidget() {
     { title: "Digital Dreams", artist: "Neo & The Machines", duration: "3:42" },
     { title: "Code Runner", artist: "Binary Beats", duration: "4:15" },
     { title: "Matrix Flow", artist: "Cyber Symphony", duration: "2:58" },
-    { title: "Electron Dance", artist: "Quantum Waves", duration: "3:33" }
+    { title: "Electron Dance", artist: "Quantum Waves", duration: "3:33" },
+    { title: "Neural Network", artist: "AI Collective", duration: "4:01" },
+    { title: "Quantum Leap", artist: "Data Stream", duration: "3:17" }
   ]
 
   const nextTrack = () => {
@@ -373,44 +461,53 @@ function MusicWidget() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 h-full flex flex-col">
       <div className="flex items-center space-x-2">
-        <Music size={16} className="text-[#00FF41]" />
-        <span className="text-xs">NOW PLAYING</span>
+        <div className="w-10 h-10 bg-gradient-to-br from-[#00FF41] to-[#00CC33] rounded flex items-center justify-center flex-shrink-0">
+          <Music size={16} className="text-black" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-bold text-white truncate">{currentTrack.title}</div>
+          <div className="text-xs text-gray-400 truncate">{currentTrack.artist}</div>
+        </div>
       </div>
       
-      <div className="space-y-1">
-        <div className="text-sm font-bold truncate">{currentTrack.title}</div>
-        <div className="text-xs text-gray-400 truncate">{currentTrack.artist}</div>
-        <div className="text-xs text-gray-500">{currentTrack.duration}</div>
+      <div className="bg-gray-800 bg-opacity-50 rounded p-2">
+        <div className="flex justify-between text-xs text-gray-400 mb-1">
+          <span>Duration</span>
+          <span className="flex-shrink-0">{currentTrack.duration}</span>
+        </div>
+        <div className="w-full bg-gray-700 h-1 rounded-full overflow-hidden">
+          <div className="bg-[#00FF41] h-1 rounded-full w-1/3"></div>
+        </div>
       </div>
       
       <div className="flex justify-center space-x-3">
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="p-2 bg-[#00FF41] bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+          className="w-10 h-10 bg-[#00FF41] bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-all duration-200 border border-[#00FF41] border-opacity-30"
         >
-          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+          {isPlaying ? <Pause size={16} className="text-[#00FF41]" /> : <Play size={16} className="text-[#00FF41] ml-0.5" />}
         </button>
         <button
           onClick={nextTrack}
-          className="p-2 bg-[#00FF41] bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+          className="w-10 h-10 bg-[#00FF41] bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-all duration-200 border border-[#00FF41] border-opacity-30"
         >
-          <SkipForward size={16} />
+          <SkipForward size={16} className="text-[#00FF41]" />
         </button>
       </div>
       
-      {/* Simple visualizer */}
+      {/* Visualizer */}
       {isPlaying && (
-        <div className="flex justify-center space-x-1">
-          {Array.from({ length: 12 }).map((_, i) => (
+        <div className="flex justify-center space-x-1 flex-1 items-end pb-2">
+          {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={i}
-              className="w-1 bg-[#00FF41] rounded animate-pulse"
+              className="w-0.5 bg-[#00FF41] rounded-full animate-pulse"
               style={{
-                height: `${Math.random() * 20 + 10}px`,
-                animationDelay: `${i * 100}ms`,
-                animationDuration: `${500 + Math.random() * 1000}ms`
+                height: `${Math.random() * 16 + 4}px`,
+                animationDelay: `${i * 30}ms`,
+                animationDuration: `${300 + Math.random() * 500}ms`
               }}
             />
           ))}
@@ -422,47 +519,117 @@ function MusicWidget() {
 
 function CryptoWidget() {
   const [crypto, setCrypto] = useState([
-    { symbol: 'BTC', price: 45230.50, change: 2.3 },
-    { symbol: 'ETH', price: 3024.75, change: -1.2 },
-    { symbol: 'SOL', price: 98.42, change: 5.7 }
+    { symbol: 'BTC', name: 'Bitcoin', price: 0, change: 0, loading: true },
+    { symbol: 'ETH', name: 'Ethereum', price: 0, change: 0, loading: true },
+    { symbol: 'SOL', name: 'Solana', price: 0, change: 0, loading: true }
   ])
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    const updatePrices = () => {
-      setCrypto(prev => prev.map(coin => ({
-        ...coin,
-        price: coin.price + (Math.random() - 0.5) * coin.price * 0.05,
-        change: (Math.random() - 0.5) * 10
-      })))
+    const fetchCryptoData = async () => {
+      try {
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true'
+        )
+        
+        if (!response.ok) throw new Error('Crypto API failed')
+        
+        const data = await response.json()
+        
+        setCrypto([
+          {
+            symbol: 'BTC',
+            name: 'Bitcoin',
+            price: data.bitcoin.usd,
+            change: data.bitcoin.usd_24h_change,
+            loading: false
+          },
+          {
+            symbol: 'ETH',
+            name: 'Ethereum',
+            price: data.ethereum.usd,
+            change: data.ethereum.usd_24h_change,
+            loading: false
+          },
+          {
+            symbol: 'SOL',
+            name: 'Solana',
+            price: data.solana.usd,
+            change: data.solana.usd_24h_change,
+            loading: false
+          }
+        ])
+        setError(false)
+      } catch (error) {
+        console.error('Crypto fetch error:', error)
+        setError(true)
+        setCrypto(prev => prev.map(coin => ({ ...coin, loading: false })))
+      }
     }
 
-    const interval = setInterval(updatePrices, 3000)
+    fetchCryptoData()
+    const interval = setInterval(fetchCryptoData, 30000)
     return () => clearInterval(interval)
   }, [])
 
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center space-x-2 mb-3">
-        <Bitcoin size={16} className="text-[#00FF41]" />
-        <span className="text-xs">CRYPTO TRACKER</span>
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <Bitcoin size={24} className="text-red-400 mb-2" />
+        <div className="text-red-400 font-bold text-xs">Error</div>
       </div>
-      
-      {crypto.map((coin) => (
-        <div key={coin.symbol} className="flex justify-between items-center">
-          <div>
-            <div className="text-sm font-bold">{coin.symbol}</div>
-            <div className="text-xs text-gray-400">
-              ${coin.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+    )
+  }
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="flex-1 space-y-2 overflow-hidden">
+        {crypto.map((coin, index) => (
+          <div key={coin.symbol} className="bg-gray-800 bg-opacity-30 rounded p-2 border border-gray-700">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                  coin.symbol === 'BTC' ? 'bg-orange-500 text-white' :
+                  coin.symbol === 'ETH' ? 'bg-blue-500 text-white' :
+                  'bg-purple-500 text-white'
+                }`}>
+                  {coin.symbol}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-white truncate">{coin.symbol}</div>
+                  <div className="text-xs text-gray-400 truncate">{coin.name}</div>
+                </div>
+              </div>
+              
+              <div className="text-right flex-shrink-0 ml-2">
+                <div className="text-xs font-bold text-white">
+                  {coin.loading ? (
+                    <div className="w-12 h-3 bg-gray-600 animate-pulse rounded"></div>
+                  ) : (
+                    `$${coin.price.toLocaleString(undefined, { 
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0 
+                    })}`
+                  )}
+                </div>
+                <div className={`text-xs flex items-center justify-end space-x-1 ${
+                  coin.loading ? 'text-gray-400' : 
+                  coin.change >= 0 ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {coin.loading ? (
+                    <div className="w-8 h-2 bg-gray-600 animate-pulse rounded"></div>
+                  ) : (
+                    <>
+                      <TrendingUp size={8} className={coin.change < 0 ? 'rotate-180' : ''} />
+                      <span className="text-xs">{coin.change >= 0 ? '+' : ''}{coin.change.toFixed(1)}%</span>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-          <div className={`text-xs flex items-center space-x-1 ${
-            coin.change >= 0 ? 'text-green-400' : 'text-red-400'
-          }`}>
-            <TrendingUp size={12} className={coin.change < 0 ? 'rotate-180' : ''} />
-            <span>{coin.change >= 0 ? '+' : ''}{coin.change.toFixed(1)}%</span>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }
@@ -506,7 +673,7 @@ function DesktopWidget({ widget, onClose }: { widget: Widget; onClose: () => voi
 
   return (
     <div
-      className="fixed bg-[#1a1a1a] bg-opacity-95 border border-[#00FF41] border-opacity-30 rounded-lg shadow-xl z-30"
+      className="fixed bg-[#1a1a1a] bg-opacity-95 border border-[#00FF41] border-opacity-30 rounded-lg shadow-xl z-30 overflow-hidden"
       style={{
         left: position.x,
         top: position.y,
@@ -517,20 +684,20 @@ function DesktopWidget({ widget, onClose }: { widget: Widget; onClose: () => voi
     >
       {/* Widget Header */}
       <div
-        className="flex items-center justify-between p-2 border-b border-[#00FF41] border-opacity-20 cursor-grab active:cursor-grabbing"
+        className="flex items-center justify-between px-2 py-1.5 border-b border-[#00FF41] border-opacity-20 cursor-grab active:cursor-grabbing bg-[#0a0a0a] bg-opacity-50"
         onMouseDown={handleMouseDown}
       >
-        <span className="text-[#00FF41] text-xs font-mono font-bold">{widget.name}</span>
+        <span className="text-[#00FF41] text-xs font-mono font-bold truncate mr-2">{widget.name}</span>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-red-400 transition-colors"
+          className="text-gray-400 hover:text-red-400 transition-colors flex-shrink-0"
         >
-          <X size={14} />
+          <X size={12} />
         </button>
       </div>
       
       {/* Widget Content */}
-      <div className="p-3 text-[#00FF41] font-mono text-sm">
+      <div className="p-2 text-[#00FF41] font-mono text-sm overflow-hidden" style={{ height: 'calc(100% - 32px)' }}>
         <widget.component />
       </div>
     </div>
@@ -795,15 +962,15 @@ export default function Desktop() {
       name: 'SYSTEM_MONITOR',
       component: SystemMonitorWidget,
       defaultPosition: { x: window.innerWidth - 250, y: 80 },
-      size: { width: 220, height: 180 },
+      size: { width: 220, height: 160 },
       visible: false
     },
     {
       id: 'weather',
       name: 'WEATHER_STATION',
       component: WeatherWidget,
-      defaultPosition: { x: window.innerWidth - 250, y: 280 },
-      size: { width: 220, height: 160 },
+      defaultPosition: { x: window.innerWidth - 250, y: 260 },
+      size: { width: 220, height: 180 },
       visible: false
     },
     {
@@ -819,7 +986,7 @@ export default function Desktop() {
       name: 'CRYPTO_TRACKER',
       component: CryptoWidget,
       defaultPosition: { x: window.innerWidth - 480, y: 80 },
-      size: { width: 200, height: 180 },
+      size: { width: 200, height: 220 },
       visible: false
     }
   ])
