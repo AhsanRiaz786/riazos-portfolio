@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { 
   Activity, 
   FolderOpen, 
@@ -21,6 +21,19 @@ import Chronos from "./chronos"
 import ReadMe from "./readme"
 import Terminal from "./terminal"
 import Contact from "./contact"
+
+// Matrix characters for the rain effect
+const matrixChars = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+interface RainDrop {
+  id: number
+  x: number
+  y: number
+  speed: number
+  char: string
+  opacity: number
+  trail: Array<{ char: string; opacity: number }>
+}
 
 const desktopIcons = [
   {
@@ -61,6 +74,97 @@ const desktopIcons = [
   },
 ]
 
+function MatrixRain() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+    }
+
+    updateDimensions()
+    window.addEventListener('resize', updateDimensions)
+    return () => window.removeEventListener('resize', updateDimensions)
+  }, [])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = dimensions.width
+    canvas.height = dimensions.height
+
+    const fontSize = 14
+    const columns = Math.floor(dimensions.width / fontSize)
+    const drops: number[] = []
+
+    // Initialize drops
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.random() * -100
+    }
+
+    let animationId: number
+
+    const draw = () => {
+      // Create fade effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.04)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      ctx.fillStyle = '#00FF41'
+      ctx.font = `${fontSize}px monospace`
+
+      for (let i = 0; i < drops.length; i++) {
+        // Get random character
+        const char = matrixChars[Math.floor(Math.random() * matrixChars.length)]
+        
+        // Calculate position
+        const x = i * fontSize
+        const y = drops[i] * fontSize
+
+        // Create gradient effect for each drop
+        const gradient = ctx.createLinearGradient(x, y - fontSize * 10, x, y)
+        gradient.addColorStop(0, 'rgba(0, 255, 65, 0)')
+        gradient.addColorStop(0.7, 'rgba(0, 255, 65, 0.8)')
+        gradient.addColorStop(1, 'rgba(0, 255, 65, 1)')
+        
+        ctx.fillStyle = gradient
+        ctx.fillText(char, x, y)
+
+        // Reset drop if it goes off screen
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0
+        }
+
+        // Move drop down
+        drops[i]++
+      }
+
+      animationId = requestAnimationFrame(draw)
+    }
+
+    draw()
+
+    return () => {
+      cancelAnimationFrame(animationId)
+    }
+  }, [dimensions])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 opacity-20"
+      style={{ width: dimensions.width, height: dimensions.height }}
+    />
+  )
+}
+
 export default function Desktop() {
   const [openWindows, setOpenWindows] = useState<string[]>([])
   const [activeWindow, setActiveWindow] = useState<string | null>(null)
@@ -100,22 +204,9 @@ export default function Desktop() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-[#0a0a0a] relative overflow-hidden">
-      {/* Animated stars background */}
-      <div className="absolute inset-0 opacity-30">
-        {Array.from({ length: 50 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          />
-        ))}
-      </div>
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Matrix Rain Background */}
+      <MatrixRain />
 
       {/* Desktop Icons */}
       <div className="absolute left-8 top-8 space-y-4 z-10">
@@ -130,11 +221,13 @@ export default function Desktop() {
       </div>
 
       {/* System Info */}
-      <div className="absolute top-4 right-4 text-[#00FF41] font-mono text-sm z-10">
+      <div className="absolute top-4 right-4 text-[#00FF41] font-mono text-sm z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
         <div>{new Date().toLocaleTimeString()}</div>
       </div>
 
-      <div className="absolute bottom-4 right-4 text-[#00FF41] font-mono text-xs opacity-60 z-10">RIAZ.OS v2024.12</div>
+      <div className="absolute bottom-4 right-4 text-[#00FF41] font-mono text-xs opacity-60 z-10 bg-black bg-opacity-30 px-2 py-1 rounded">
+        RIAZ.OS v2024.12
+      </div>
 
       {/* Windows */}
       {openWindows.map((windowId) => {
