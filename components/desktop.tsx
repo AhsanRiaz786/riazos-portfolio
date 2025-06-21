@@ -1,6 +1,18 @@
 "use client"
 
 import { useState } from "react"
+import { 
+  Activity, 
+  FolderOpen, 
+  Clock, 
+  FileText, 
+  Terminal as TerminalIcon, 
+  Shield,
+  Monitor,
+  Code,
+  History,
+  Mail
+} from "lucide-react"
 import DesktopIcon from "./desktop-icon"
 import Window from "./window"
 import ProcessManager from "./process-manager"
@@ -15,37 +27,37 @@ const desktopIcons = [
     id: "process-manager",
     label: "//PROCESS_MANAGER",
     description: "Active Projects & Live Systems",
-    icon: "🖥️",
+    icon: <Activity size={24} strokeWidth={1.5} />,
   },
   {
     id: "tech-stack",
     label: "/tech_stack",
     description: "Tools, Languages & Frameworks",
-    icon: "📁",
+    icon: <FolderOpen size={24} strokeWidth={1.5} />,
   },
   {
     id: "chronos",
     label: "CHRONOS.log",
     description: "Professional Journey & Experience",
-    icon: "⏰",
+    icon: <History size={24} strokeWidth={1.5} />,
   },
   {
     id: "readme",
     label: "README.md",
     description: "About the Human Behind the Code",
-    icon: "📄",
+    icon: <FileText size={24} strokeWidth={1.5} />,
   },
   {
     id: "terminal",
     label: "TERMINAL",
     description: "Direct System Access",
-    icon: "💻",
+    icon: <TerminalIcon size={24} strokeWidth={1.5} />,
   },
   {
     id: "contact",
     label: "SECURE_CONNECTION",
     description: "Establish Contact Protocol",
-    icon: "🔐",
+    icon: <Shield size={24} strokeWidth={1.5} />,
   },
 ]
 

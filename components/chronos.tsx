@@ -6,57 +6,50 @@ const timelineEvents = [
   {
     timestamp: "2006-02-04 00:00",
     type: "INIT",
-    event: "Spwaned in Faisalabad",
-    details: "It was a good day.",
+    event: "Spawned in a small village near Faisalabad",
+    details: "It was a good sunny day.",
     expandable: false,
   },
   {
-    timestamp: "2021-09-01 09:00",
+    timestamp: "2021-07-01 09:00",
+    type: "INIT",
+    event: "Started ICS at Punjab Group of Colleges",
+    details: "Beginning the journey into computer sciences",
+    expandable: false,
+  },
+  {
+    timestamp: "2022-02-15 10:30",
+    type: "EVENT",
+    event: 'Wrote Hello World in Python',
+    details: "The moment I realized code could do amazing things",
+    expandable: false,
+  },
+  {
+    timestamp: "2023-04-12 14:20",
+    type: "MILESTONE",
+    event: "Built first web scraper",
+    details: "Scraped data from various websites to automate tedious tasks",
+    expandable: false,
+  },
+  {
+    timestamp: "2023-06-01 09:00",
+    type: "PROCESS_START",
+    event: "Started Upwork journey",
+    details: "Decided to turn coding skills into real income",
+    expandable: false,
+  },
+  {
+    timestamp: "2023-07-15 11:00",
+    type: "ACHIEVEMENT",
+    event: "First Upwork client, humble beginnings",
+    details: "Built a simple automation tool for $20. Small start, but every journey begins with a single step.",
+    expandable: false,
+  },
+  {
+    timestamp: "2023-09-01 09:00",
     type: "INIT",
     event: "Started BSCS journey at NUST",
     details: "Beginning of the academic adventure in Computer Science",
-    expandable: false,
-  },
-  {
-    timestamp: "2021-09-15 10:30",
-    type: "EVENT",
-    event: 'First Python script - "Hello, automation!"',
-    details: "The moment I realized code could do the boring stuff for me",
-    expandable: false,
-  },
-  {
-    timestamp: "2022-03-12 14:20",
-    type: "MILESTONE",
-    event: "Built first web scraper",
-    details: "Scraped university course data to help classmates find available slots",
-    expandable: false,
-  },
-  {
-    timestamp: "2022-08-05 16:45",
-    type: "LEVEL_UP",
-    event: "Discovered React, fell in love with frontend",
-    details: "Component-based thinking changed how I approach problem-solving",
-    expandable: false,
-  },
-  {
-    timestamp: "2023-01-20 11:00",
-    type: "ACHIEVEMENT",
-    event: "First Upwork client, nervous but excited",
-    details: "Built a data extraction tool for a small business. $200 project that taught me more than any textbook.",
-    expandable: false,
-  },
-  {
-    timestamp: "2023-06-15 09:30",
-    type: "PROCESS_START",
-    event: "Freelance career officially launched",
-    details: "Decided to turn coding skills into real income while studying",
-    expandable: false,
-  },
-  {
-    timestamp: "2023-07-08 15:20",
-    type: "SUCCESS",
-    event: "100% project success rate maintained",
-    details: "Every client happy, every deadline met. Quality over quantity approach paying off.",
     expandable: false,
   },
   {
@@ -73,13 +66,6 @@ const timelineEvents = [
     expandable: true,
   },
   {
-    timestamp: "2024-06-25 14:30",
-    type: "IMPACT",
-    event: "Improved app performance by 15%",
-    details: "Optimized React components and database queries during internship",
-    expandable: false,
-  },
-  {
     timestamp: "2024-07-15 12:00",
     type: "RETURN",
     event: "Back to freelancing with new perspectives",
@@ -89,15 +75,22 @@ const timelineEvents = [
   {
     timestamp: "2024-12-01 16:45",
     type: "STATUS",
-    event: "Top Rated on Upwork, 15+ projects completed",
-    details: "Consistent 5-star ratings, $4000+ revenue, 100% success rate maintained",
+    event: "Top Rated on Upwork",
+    details: "Achieved Top Rated status with consistent 5-star ratings and 100% success rate",
     expandable: false,
   },
   {
-    timestamp: "2024-12-15 10:00",
+    timestamp: "2025-04-01 10:00",
+    type: "PROJECT",
+    event: "Started Working on Giraph AI Platform",
+    details: "Leading development of an innovative AI-powered analytics platform",
+    expandable: false,
+  },
+  {
+    timestamp: "2025-06-01 09:00",
     type: "CURRENT",
-    event: "Building systems that solve real problems",
-    details: "Focus shifted from just coding to understanding business needs and creating lasting solutions",
+    event: "Started as Web Developer at Aawaz AI",
+    details: "Joining a dynamic team to build cutting-edge AI solutions",
     expandable: false,
   },
 ]
@@ -129,6 +122,8 @@ export default function Chronos() {
         return "text-cyan-400"
       case "STATUS":
         return "text-[#00FF41]"
+      case "PROJECT":
+        return "text-purple-300"
       case "CURRENT":
         return "text-[#FF00F7]"
       default:
