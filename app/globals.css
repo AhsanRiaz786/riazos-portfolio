@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-fira-code), monospace;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: var(--font-fira-code), monospace;
+}
+
+.font-roboto-mono {
+  font-family: var(--font-roboto-mono), monospace;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff00f7;
+}
+
+/* Terminal cursor blink */
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+/* Matrix rain effect for background */
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-100vh);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+.matrix-rain {
+  animation: matrix-fall linear infinite;
+}
+
+/* Glitch effect for special elements */
+@keyframes glitch {
+  0% {
+    text-shadow: 0.05em 0 0 #00ff41, -0.05em -0.025em 0 #ff00f7, 0.025em 0.05em 0 #ffffff;
+  }
+  15% {
+    text-shadow: 0.05em 0 0 #00ff41, -0.05em -0.025em 0 #ff00f7, 0.025em 0.05em 0 #ffffff;
+  }
+  16% {
+    text-shadow: -0.05em -0.025em 0 #00ff41, 0.025em 0.025em 0 #ff00f7, -0.05em -0.05em 0 #ffffff;
+  }
+  49% {
+    text-shadow: -0.05em -0.025em 0 #00ff41, 0.025em 0.025em 0 #ff00f7, -0.05em -0.05em 0 #ffffff;
+  }
+  50% {
+    text-shadow: 0.025em 0.05em 0 #00ff41, 0.05em 0 0 #ff00f7, 0 -0.05em 0 #ffffff;
+  }
+  99% {
+    text-shadow: 0.025em 0.05em 0 #00ff41, 0.05em 0 0 #ff00f7, 0 -0.05em 0 #ffffff;
+  }
+  100% {
+    text-shadow: -0.025em 0 0 #00ff41, -0.025em -0.025em 0 #ff00f7, -0.025em -0.05em 0 #ffffff;
+  }
+}
+
+.glitch {
+  animation: glitch 0.3s infinite;
+}
