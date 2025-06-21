@@ -90,21 +90,25 @@ Use 'cat project_[number].log' for detailed case studies`,
 
 Current Status: Building systems that solve real problems`,
 
-  neofetch: `          ██████████████████          ahsan@riaz.os
-      ████                  ████      ─────────────────
-    ██        ████████        ██      OS: RiazOS v2024.12
-  ██      ████        ████      ██    Host: The Ghost in the Machine
-██      ██              ██      ██    Kernel: Problem-Solver 3.26.0
-██    ██                  ██    ██    Uptime: 21 years, 3 months
-██    ██                  ██    ██    Packages: 100+ npm, 50+ pip
-██      ██              ██      ██    Shell: zsh with oh-my-zsh
-  ██      ████        ████      ██    Resolution: Full-Stack
-    ██        ████████        ██      DE: VS Code + Terminal
-      ████                  ████      Theme: Dark Mode [Always]
-          ██████████████████          Icons: Font Awesome Pro
-                                      Terminal: iTerm2
-                                      CPU: Intel i7 + Coffee Engine
-                                      Memory: 16GB + Unlimited Curiosity`,
+  neofetch: `                   -\`                    ahsan@riaz.os
+                  .o+\`                   ─────────────────
+                 \`ooo/                   OS: RiazOS v2.0 (Arch-based)
+                \`+oooo:                  Host: Developer Workstation
+               \`+oooooo:                 Kernel: Unix 4.4.4
+               -+oooooo+:                Uptime: 19 years, 5 months
+             \`/:-:++oooo+:               Packages: 100+ npm, 50+ pip
+            \`/++++/+++++++:              Shell: zsh with oh-my-zsh
+           \`/++++++++++++++:             Resolution: Full-Stack
+          \`/+++ooooooooo++++/\`           DE: VS Code + Terminal
+         ./ooosssso++osssssso+\`          Theme: Dark Mode [Always]
+        .oossssso-\`\`\`\`/ossssss+\`         Icons: Font Awesome Pro
+       -osssssso.      :ssssssso.        Terminal: iTerm2
+      :osssssss/        osssso+++.       CPU: M2 + Cha Engine
+     /ossssssss/        +ssssooo/-       Memory: 16GB + Unlimited Curiosity
+   \`/ossssso+/:-        -:/+osssso+-     
+  \`+sso+:-\`                 \`.-/+oso:    
+ \`++:.                           \`-/+/   
+ .\`                                 \`/   `,
 
   whoami: `ahsan
 Current user: Ahsan Riaz
@@ -135,7 +139,7 @@ CONTACT_PROTOCOLS_AVAILABLE:
     Connection: Always Open
     
 [3] GITHUB_REPOSITORY  
-    Username: @ahsanriaz8000
+    Username: @ahsanriaz786
     Protocol: Git/HTTPS
     Contributions: Daily
     
