@@ -1,6 +1,15 @@
 "use client"
 
 import { useState } from "react"
+import { 
+  Mail, 
+  Briefcase, 
+  Github, 
+  DollarSign, 
+  Phone,
+  Shield,
+  Check
+} from "lucide-react"
 
 export default function Contact() {
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "idle">("idle")
@@ -20,35 +29,35 @@ export default function Contact() {
       address: "ahsanriaz8000@gmail.com",
       protocol: "SMTP (Secure)",
       responseTime: "< 24 hours",
-      icon: "📧",
+      icon: <Mail size={20} strokeWidth={1.5} className="text-[#00FF41]" />,
       action: () => window.open("mailto:ahsanriaz8000@gmail.com?subject=Project Inquiry from RiazOS"),
     },
     {
       id: "linkedin",
       name: "LINKEDIN_NETWORK",
-      address: "/in/ahsan-riaz-dev",
+      address: "https://www.linkedin.com/in/ahsan-riaz-1254992a3",
       protocol: "Professional Network",
       responseTime: "Always Open",
-      icon: "💼",
-      action: () => window.open("https://linkedin.com/in/ahsan-riaz-dev", "_blank"),
+      icon: <Briefcase size={20} strokeWidth={1.5} className="text-[#0077B5]" />,
+      action: () => window.open("https://www.linkedin.com/in/ahsan-riaz-1254992a3", "_blank"),
     },
     {
       id: "github",
       name: "GITHUB_REPOSITORY",
-      address: "@ahsanriaz8000",
+      address: "@ahsanriaz786",
       protocol: "Git/HTTPS",
       responseTime: "Daily",
-      icon: "🐙",
-      action: () => window.open("https://github.com/ahsanriaz8000", "_blank"),
+      icon: <Github size={20} strokeWidth={1.5} className="text-[#E5E5E5]" />,
+      action: () => window.open("https://github.com/ahsanriaz786", "_blank"),
     },
     {
       id: "upwork",
       name: "UPWORK_PLATFORM",
-      address: "Top Rated Freelancer",
-      protocol: "100% Success Rate",
+      address: "https://www.upwork.com/freelancers/~01d4988598a9368ee5",
+      protocol: "Top Rated Freelancer",
       responseTime: "Open for Projects",
-      icon: "💚",
-      action: () => window.open("https://upwork.com", "_blank"),
+      icon: <DollarSign size={20} strokeWidth={1.5} className="text-[#14A800]" />,
+      action: () => window.open("https://www.upwork.com/freelancers/~01d4988598a9368ee5", "_blank"),
     },
     {
       id: "phone",
@@ -56,7 +65,7 @@ export default function Contact() {
       address: "+92 304 094 9380",
       protocol: "Voice/SMS",
       responseTime: "Urgent Projects Only",
-      icon: "📱",
+      icon: <Phone size={20} strokeWidth={1.5} className="text-[#FF00F7]" />,
       action: () => window.open("tel:+923040949380"),
     },
   ]
@@ -113,12 +122,12 @@ export default function Contact() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <span className="text-2xl">{method.icon}</span>
+                    <div className="w-8 h-8 flex items-center justify-center">{method.icon}</div>
                     <div>
                       <div className="text-[#00FF41] font-semibold">
                         [{index + 1}] {method.name}
                       </div>
-                      <div className="text-sm text-[#E5E5E5]">{method.address}</div>
+                      <div className="text-sm text-[#E5E5E5] break-all">{method.address}</div>
                     </div>
                   </div>
                   <div className="text-right text-xs">
@@ -149,15 +158,21 @@ export default function Contact() {
             <div className="text-xs space-y-1">
               <div className="flex justify-between">
                 <span>Encryption:</span>
-                <span className="text-[#00FF41]">AES-256 ✓</span>
+                <span className="text-[#00FF41] flex items-center gap-1">
+                  AES-256 <Check size={12} strokeWidth={2} />
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Identity Verified:</span>
-                <span className="text-[#00FF41]">TRUE ✓</span>
+                <span className="text-[#00FF41] flex items-center gap-1">
+                  TRUE <Check size={12} strokeWidth={2} />
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Response Rate:</span>
-                <span className="text-[#00FF41]">100% ✓</span>
+                <span className="text-[#00FF41] flex items-center gap-1">
+                  100% <Check size={12} strokeWidth={2} />
+                </span>
               </div>
             </div>
           </div>
