@@ -29,9 +29,8 @@ git branch            - Show active branches
 git activity          - Show recent GitHub activity
 games                 - List available games
 snake                 - Play Snake game
-tetris                - Play Tetris (ASCII)
 guess                 - Number guessing game
-maze                  - Navigate a maze
+hack                  - Hacker simulator
 easter_egg            - Find the hidden surprise`,
 
   about: `NAME: Ahsan Riaz
@@ -806,15 +805,7 @@ Available Games:
                     I think of a number, you guess it
                     Uses your coding logic skills
                     
-[3] tetris         ASCII Tetris (Coming Soon)
-                    Block-stacking puzzle game
-                    Full terminal implementation
-                    
-[4] maze           Maze Navigator (Coming Soon)
-                    Navigate through ASCII mazes
-                    Find the exit path
-
-[5] hack           Hacker Simulator
+[3] hack           Hacker Simulator
                     Pretend to hack the mainframe
                     Pure fun and nostalgia
 
@@ -1193,10 +1184,7 @@ Initiating hack sequence...
       return
     }
 
-    if (command === "tetris" || command === "maze") {
-      setHistory((prev) => [...prev, { type: "output", content: `${command.toUpperCase()} - Coming Soon!\n\nThis game is still under development.\nFor now, try 'snake', 'guess', or 'hack'!\n\nType 'games' to see all available games.` }])
-      return
-    }
+
 
     // Check if command exists in static commands
     const staticCommand = cmd.trim().toLowerCase();
