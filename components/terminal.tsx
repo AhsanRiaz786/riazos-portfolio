@@ -27,10 +27,11 @@ git status            - Show portfolio git status
 git log               - Show recent commits
 git branch            - Show active branches
 git activity          - Show recent GitHub activity
-games                 - Show available games
+games                 - List available games
 snake                 - Play Snake game
-2048                  - Play 2048 puzzle
+tetris                - Play Tetris (ASCII)
 guess                 - Number guessing game
+maze                  - Navigate a maze
 easter_egg            - Find the hidden surprise`,
 
   about: `NAME: Ahsan Riaz
@@ -563,7 +564,7 @@ export default function Terminal() {
   const [currentDir, setCurrentDir] = useState('/')
   const [gitData, setGitData] = useState<any>(null)
   const [gameState, setGameState] = useState<any>(null)
-  const [currentGame, setCurrentGame] = useState<string | null>(null)
+  const [gameMode, setGameMode] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -790,379 +791,313 @@ Tip: Use 'git activity' to see recent development activity`;
     return output;
   };
 
-  // Game implementations
-  const initSnakeGame = () => {
-    return {
-      board: Array(15).fill().map(() => Array(15).fill('.')),
-      snake: [[7, 7], [7, 6], [7, 5]],
-      food: [3, 3],
-      direction: 'RIGHT',
-      gameOver: false,
-      score: 0
-    };
+  // Game Functions
+  const getGamesList = () => {
+    return `TERMINAL GAMES - Easter Eggs Collection
+
+Available Games:
+================
+
+[1] snake           ASCII Snake Game
+                    Use WASD or arrow keys to move
+                    Eat food to grow, avoid walls!
+                    
+[2] guess          Number Guessing Game  
+                    I think of a number, you guess it
+                    Uses your coding logic skills
+                    
+[3] tetris         ASCII Tetris (Coming Soon)
+                    Block-stacking puzzle game
+                    Full terminal implementation
+                    
+[4] maze           Maze Navigator (Coming Soon)
+                    Navigate through ASCII mazes
+                    Find the exit path
+
+[5] hack           Hacker Simulator
+                    Pretend to hack the mainframe
+                    Pure fun and nostalgia
+
+Usage: Type the game name to start (e.g., 'snake')
+Type 'exit' during any game to return to terminal
+
+>> Pro tip: These games showcase interactive terminal programming!`;
   };
 
-  const renderSnakeGame = (state: any) => {
-    const board = Array(15).fill().map(() => Array(15).fill('.'));
+  const startSnakeGame = () => {
+    const initialSnake = [{ x: 10, y: 10 }];
+    const initialFood = { x: 15, y: 15 };
     
-    // Place food
-    board[state.food[0]][state.food[1]] = 'F';
-    
-    // Place snake
-    state.snake.forEach((segment: number[], index: number) => {
-      if (index === 0) {
-        board[segment[0]][segment[1]] = 'H'; // Head
-      } else {
-        board[segment[0]][segment[1]] = 'O'; // Body
-      }
+    setGameMode('snake');
+    setGameState({
+      snake: initialSnake,
+      food: initialFood,
+      direction: 'RIGHT',
+      score: 0,
+      gameOver: false,
+      width: 30,
+      height: 20
     });
 
-    let output = `SNAKE GAME - Score: ${state.score}\n`;
-    output += `Controls: w(up) a(left) s(down) d(right) q(quit)\n\n`;
-    output += '+' + '-'.repeat(15) + '+\n';
+    return `SNAKE GAME STARTED!
     
-    board.forEach(row => {
-      output += '|' + row.join('') + '|\n';
-    });
+┌${'─'.repeat(32)}┐
+│  Use WASD to move the snake    │
+│  Eat the food (@) to grow      │
+│  Avoid hitting walls or self   │  
+│  Type 'exit' to quit game      │
+└${'─'.repeat(32)}┘
+
+Press any WASD key to begin...`;
+  };
+
+  const renderSnakeGame = () => {
+    if (!gameState || gameMode !== 'snake') return '';
     
-    output += '+' + '-'.repeat(15) + '+\n';
+    const { snake, food, score, gameOver, width, height } = gameState;
     
-    if (state.gameOver) {
-      output += `\nGAME OVER! Final Score: ${state.score}\n`;
-      output += 'Type "snake" to play again or any other command to exit.';
-    } else {
-      output += '\nF = Food, H = Head, O = Body';
+    if (gameOver) {
+      return `GAME OVER!
+
+Final Score: ${score}
+Length: ${snake.length}
+
+Type 'snake' to play again or 'exit' to return to terminal.`;
     }
+
+    // Create game board
+    let board = [];
+    for (let y = 0; y < height; y++) {
+      let row = [];
+      for (let x = 0; x < width; x++) {
+        if (snake.some((segment: any) => segment.x === x && segment.y === y)) {
+          row.push(snake[0].x === x && snake[0].y === y ? 'O' : 'o');
+        } else if (food.x === x && food.y === y) {
+          row.push('@');
+        } else {
+          row.push(' ');
+        }
+      }
+      board.push(row);
+    }
+
+    let output = `SNAKE GAME - Score: ${score}\n\n`;
+    output += '┌' + '─'.repeat(width) + '┐\n';
+    for (let row of board) {
+      output += '│' + row.join('') + '│\n';
+    }
+    output += '└' + '─'.repeat(width) + '┘\n';
+    output += '\nUse WASD to move | Type "exit" to quit';
     
     return output;
   };
 
-  const moveSnake = (state: any, direction: string) => {
-    if (state.gameOver) return state;
-    
-    const directions: {[key: string]: number[]} = {
-      'w': [-1, 0], 'a': [0, -1], 's': [1, 0], 'd': [0, 1]
-    };
-    
-    if (!directions[direction]) return state;
-    
-    const move = directions[direction];
-    const head = state.snake[0];
-    const newHead = [head[0] + move[0], head[1] + move[1]];
-    
-    // Check boundaries
-    if (newHead[0] < 0 || newHead[0] >= 15 || newHead[1] < 0 || newHead[1] >= 15) {
-      return { ...state, gameOver: true };
+  const updateSnakeGame = (direction: string) => {
+    if (!gameState || gameMode !== 'snake' || gameState.gameOver) return;
+
+    const { snake, food, score, width, height } = gameState;
+    const head = { ...snake[0] };
+
+    // Update direction
+    switch (direction.toUpperCase()) {
+      case 'W': head.y -= 1; break;
+      case 'S': head.y += 1; break;
+      case 'A': head.x -= 1; break;
+      case 'D': head.x += 1; break;
+      default: return;
     }
-    
+
+    // Check wall collision
+    if (head.x < 0 || head.x >= width || head.y < 0 || head.y >= height) {
+      setGameState({ ...gameState, gameOver: true });
+      return;
+    }
+
     // Check self collision
-    if (state.snake.some((segment: number[]) => segment[0] === newHead[0] && segment[1] === newHead[1])) {
-      return { ...state, gameOver: true };
+    if (snake.some((segment: any) => segment.x === head.x && segment.y === head.y)) {
+      setGameState({ ...gameState, gameOver: true });
+      return;
     }
-    
-    const newSnake = [newHead, ...state.snake];
-    let newFood = state.food;
-    let newScore = state.score;
-    
-    // Check if food eaten
-    if (newHead[0] === state.food[0] && newHead[1] === state.food[1]) {
+
+    const newSnake = [head, ...snake];
+    let newFood = food;
+    let newScore = score;
+
+    // Check food collision
+    if (head.x === food.x && head.y === food.y) {
       newScore += 10;
-      // Generate new food position
+      // Generate new food
       do {
-        newFood = [Math.floor(Math.random() * 15), Math.floor(Math.random() * 15)];
-      } while (newSnake.some((segment: number[]) => segment[0] === newFood[0] && segment[1] === newFood[1]));
+        newFood = {
+          x: Math.floor(Math.random() * width),
+          y: Math.floor(Math.random() * height)
+        };
+      } while (newSnake.some((segment: any) => segment.x === newFood.x && segment.y === newFood.y));
     } else {
       newSnake.pop(); // Remove tail if no food eaten
     }
-    
-    return {
-      ...state,
+
+    setGameState({
+      ...gameState,
       snake: newSnake,
       food: newFood,
-      score: newScore
-    };
-  };
-
-  const init2048Game = () => {
-    const board = Array(4).fill().map(() => Array(4).fill(0));
-    // Add two initial tiles
-    addRandomTile(board);
-    addRandomTile(board);
-    return {
-      board,
-      score: 0,
-      gameOver: false,
-      won: false
-    };
-  };
-
-  const addRandomTile = (board: number[][]) => {
-    const empty: number[][] = [];
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        if (board[i][j] === 0) empty.push([i, j]);
-      }
-    }
-    if (empty.length > 0) {
-      const pos = empty[Math.floor(Math.random() * empty.length)];
-      board[pos[0]][pos[1]] = Math.random() < 0.9 ? 2 : 4;
-    }
-  };
-
-  const render2048Game = (state: any) => {
-    let output = `2048 GAME - Score: ${state.score}\n`;
-    output += `Controls: w(up) a(left) s(down) d(right) q(quit)\n\n`;
-    
-    output += '+' + '------+'.repeat(4) + '\n';
-    
-    state.board.forEach((row: number[]) => {
-      output += '|';
-      row.forEach((cell: number) => {
-        const display = cell === 0 ? '    ' : cell.toString().padStart(4);
-        output += display + '  |';
-      });
-      output += '\n+' + '------+'.repeat(4) + '\n';
-    });
-    
-    if (state.won) {
-      output += '\nCONGRATULATIONS! You reached 2048!\n';
-    } else if (state.gameOver) {
-      output += '\nGAME OVER! No more moves available.\n';
-    }
-    
-    output += '\nCombine tiles to reach 2048!';
-    return output;
-  };
-
-  const move2048 = (state: any, direction: string) => {
-    if (state.gameOver || state.won) return state;
-    
-    const newBoard = state.board.map((row: number[]) => [...row]);
-    let moved = false;
-    let newScore = state.score;
-    
-    const moveLeft = (board: number[][]) => {
-      for (let i = 0; i < 4; i++) {
-        const row = board[i].filter(val => val !== 0);
-        for (let j = 0; j < row.length - 1; j++) {
-          if (row[j] === row[j + 1]) {
-            row[j] *= 2;
-            newScore += row[j];
-            row[j + 1] = 0;
-            if (row[j] === 2048) state.won = true;
-          }
-        }
-        const newRow = row.filter(val => val !== 0);
-        while (newRow.length < 4) newRow.push(0);
-        
-        for (let j = 0; j < 4; j++) {
-          if (board[i][j] !== newRow[j]) moved = true;
-          board[i][j] = newRow[j];
-        }
-      }
-    };
-    
-    // Transform board based on direction
-    if (direction === 'a') {
-      moveLeft(newBoard);
-    } else if (direction === 'd') {
-      // Reverse, move left, reverse back
-      newBoard.forEach(row => row.reverse());
-      moveLeft(newBoard);
-      newBoard.forEach(row => row.reverse());
-    } else if (direction === 'w') {
-      // Transpose, move left, transpose back
-      const transposed = newBoard[0].map((_, i) => newBoard.map(row => row[i]));
-      moveLeft(transposed);
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) {
-          if (newBoard[i][j] !== transposed[j][i]) moved = true;
-          newBoard[i][j] = transposed[j][i];
-        }
-      }
-    } else if (direction === 's') {
-      // Transpose, reverse, move left, reverse, transpose back
-      const transposed = newBoard[0].map((_, i) => newBoard.map(row => row[i]));
-      transposed.forEach(row => row.reverse());
-      moveLeft(transposed);
-      transposed.forEach(row => row.reverse());
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) {
-          if (newBoard[i][j] !== transposed[j][i]) moved = true;
-          newBoard[i][j] = transposed[j][i];
-        }
-      }
-    }
-    
-    if (moved) {
-      addRandomTile(newBoard);
-    }
-    
-    // Check game over
-    const hasEmptyCell = newBoard.some(row => row.includes(0));
-    const canMove = () => {
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) {
-          if (j < 3 && newBoard[i][j] === newBoard[i][j + 1]) return true;
-          if (i < 3 && newBoard[i][j] === newBoard[i + 1][j]) return true;
-        }
-      }
-      return false;
-    };
-    
-    const gameOver = !hasEmptyCell && !canMove();
-    
-    return {
-      board: newBoard,
       score: newScore,
-      gameOver,
-      won: state.won
-    };
+      direction
+    });
   };
 
-  const initGuessGame = () => {
-    return {
-      target: Math.floor(Math.random() * 100) + 1,
+  const startGuessingGame = () => {
+    const targetNumber = Math.floor(Math.random() * 100) + 1;
+    setGameMode('guess');
+    setGameState({
+      target: targetNumber,
       attempts: 0,
       guesses: [],
-      gameOver: false,
-      won: false
-    };
+      gameOver: false
+    });
+
+    return `NUMBER GUESSING GAME
+    
+┌─────────────────────────────────────┐
+│  I'm thinking of a number 1-100     │
+│  Can you guess it?                  │
+│                                     │
+│  Hints: I'll tell you if your       │
+│  guess is too high or too low       │
+│                                     │
+│  Type your guess or 'exit' to quit  │
+└─────────────────────────────────────┘
+
+Enter your first guess:`;
   };
 
-  const renderGuessGame = (state: any) => {
-    let output = `NUMBER GUESSING GAME\n`;
-    output += `Guess a number between 1 and 100!\n`;
-    output += `Attempts: ${state.attempts}\n\n`;
+  const processGuess = (guess: string) => {
+    if (!gameState || gameMode !== 'guess') return '';
     
-    if (state.guesses.length > 0) {
-      output += `Your guesses:\n`;
-      state.guesses.forEach((guess: any) => {
-        output += `${guess.number} - ${guess.hint}\n`;
-      });
-      output += '\n';
+    const num = parseInt(guess);
+    if (isNaN(num) || num < 1 || num > 100) {
+      return 'Please enter a number between 1 and 100!';
     }
-    
-    if (state.won) {
-      output += `CONGRATULATIONS! You guessed ${state.target} in ${state.attempts} attempts!\n`;
-      output += 'Type "guess" to play again.';
-    } else if (state.gameOver) {
-      output += `Game Over! The number was ${state.target}.\n`;
-      output += 'Type "guess" to play again.';
-    } else {
-      output += 'Enter your guess (1-100) or "q" to quit:';
+
+    const { target, attempts, guesses } = gameState;
+    const newAttempts = attempts + 1;
+    const newGuesses = [...guesses, num];
+
+    if (num === target) {
+      setGameState({ ...gameState, gameOver: true, attempts: newAttempts });
+      return `[SUCCESS] CONGRATULATIONS! [SUCCESS]
+
+You guessed it! The number was ${target}
+Attempts: ${newAttempts}
+Your guesses: ${newGuesses.join(', ')}
+
+${newAttempts <= 3 ? 'Incredible! You\'re a mind reader!' :
+  newAttempts <= 7 ? 'Great job! Nice logical thinking!' :
+  newAttempts <= 10 ? 'Good work! You got there!' :
+  'You found it! Persistence pays off!'}
+
+Type 'guess' to play again or 'exit' to return.`;
     }
+
+    setGameState({
+      ...gameState,
+      attempts: newAttempts,
+      guesses: newGuesses
+    });
+
+    const hint = num < target ? 'TOO LOW' : 'TOO HIGH';
+    return `Guess ${newAttempts}: ${num} - ${hint}
+
+Attempts so far: ${newAttempts}
+Your guesses: ${newGuesses.join(', ')}
+
+Enter your next guess:`;
+  };
+
+  const startHackSimulator = () => {
+    const hackerSequence = [
+      'Initializing connection...',
+      'Bypassing firewall...',
+      'Scanning for vulnerabilities...',
+      'Injecting payload...',
+      'Escalating privileges...',
+      'Accessing mainframe...',
+      'Downloading classified files...',
+      'Covering tracks...',
+      'Connection terminated.',
+      '',
+      'HACK COMPLETE!',
+      '>> All your base are belong to us <<'
+    ];
+
+    let output = `HACKER SIMULATOR v2.0
     
+┌─────────────────────────────────────┐
+│  WARNING: For educational purposes  │
+│  This is just for fun! :)           │
+└─────────────────────────────────────┘
+
+Initiating hack sequence...
+
+`;
+
+    hackerSequence.forEach((line, index) => {
+      if (line === '') {
+        output += '\n';
+      } else if (line === 'HACK COMPLETE!') {
+        output += `[SUCCESS] ${line}\n`;
+      } else if (line.includes('>>')) {
+        output += `${line}\n`;
+      } else {
+        output += `[${String(index + 1).padStart(2, '0')}] ${line}\n`;
+      }
+    });
+
+    output += '\n>> Remember: With great power comes great responsibility!';
+    output += '\n>> Type any other command to return to normal terminal.';
+
     return output;
   };
-
-  const makeGuess = (state: any, input: string) => {
-    if (state.gameOver || state.won) return state;
-    
-    const guess = parseInt(input);
-    if (isNaN(guess) || guess < 1 || guess > 100) {
-      return state;
-    }
-    
-    const attempts = state.attempts + 1;
-    const guesses = [...state.guesses];
-    
-    let hint = '';
-    let won = false;
-    let gameOver = false;
-    
-    if (guess === state.target) {
-      hint = 'CORRECT!';
-      won = true;
-    } else if (guess < state.target) {
-      hint = 'Too low!';
-    } else {
-      hint = 'Too high!';
-    }
-    
-    if (attempts >= 10 && !won) {
-      gameOver = true;
-    }
-    
-    guesses.push({ number: guess, hint });
-    
-    return {
-      ...state,
-      attempts,
-      guesses,
-      gameOver,
-      won
-    };
-  };
-
-  const getGamesMenu = () => {
-    return `AVAILABLE GAMES:
-
-[1] snake  - Classic Snake Game
-    Navigate the snake to eat food and grow!
-    Controls: w(up) a(left) s(down) d(right)
-
-[2] 2048   - Number Puzzle Game  
-    Combine tiles to reach 2048!
-    Controls: w(up) a(left) s(down) d(right)
-
-[3] guess  - Number Guessing Game
-    Guess the secret number between 1-100!
-    10 attempts to find the right number.
-
-Type the game name to start playing!
-Type 'q' during any game to quit back to terminal.
-
->> These games showcase interactive programming skills!`;
 
   const handleCommand = (cmd: string) => {
     const parts = cmd.trim().split(' ');
     const command = parts[0].toLowerCase();
     const args = parts.slice(1);
 
-    // Handle game input differently
-    if (currentGame) {
-      const input = cmd.trim().toLowerCase();
-      
-      // Check for quit command
-      if (input === 'q' || input === 'quit') {
-        setCurrentGame(null);
-        setGameState(null);
-        setHistory((prev) => [...prev, { type: "output", content: "Game ended. Back to terminal." }])
-        return;
-      }
-      
-      // Handle game-specific input
-      if (currentGame === 'snake') {
-        if (['w', 'a', 's', 'd'].includes(input)) {
-          const newState = moveSnake(gameState, input);
-          setGameState(newState);
-          setHistory((prev) => [...prev, { type: "output", content: renderSnakeGame(newState) }])
-        }
-      } else if (currentGame === '2048') {
-        if (['w', 'a', 's', 'd'].includes(input)) {
-          const newState = move2048(gameState, input);
-          setGameState(newState);
-          setHistory((prev) => [...prev, { type: "output", content: render2048Game(newState) }])
-        }
-      } else if (currentGame === 'guess') {
-        const newState = makeGuess(gameState, input);
-        setGameState(newState);
-        setHistory((prev) => [...prev, { type: "output", content: renderGuessGame(newState) }])
-        
-        if (newState.won || newState.gameOver) {
-          setCurrentGame(null);
-          setGameState(null);
-        }
-      }
-      return;
-    }
-
     // Add command to history with current directory
     const prompt = `riaz@portfolio:${currentDir === '/' ? '~' : currentDir}$`;
     setHistory((prev) => [...prev, { type: "command", content: `${prompt} ${cmd}` }])
     setCommandHistory((prev) => [...prev, cmd])
     setHistoryIndex(-1)
+
+    // Handle game inputs
+    if (gameMode === 'snake') {
+      if (command === 'exit') {
+        setGameMode(null);
+        setGameState(null);
+        setHistory(prev => [...prev, { type: 'output', content: 'Game exited. Returning to terminal.' }]);
+        return;
+      }
+      if (['w', 'a', 's', 'd'].includes(command)) {
+        updateSnakeGame(command);
+        setHistory(prev => [...prev, { type: 'output', content: renderSnakeGame() }]);
+        return;
+      }
+      setHistory(prev => [...prev, { type: 'output', content: renderSnakeGame() }]);
+      return;
+    }
+
+    if (gameMode === 'guess' && !gameState?.gameOver) {
+      if (command === 'exit') {
+        setGameMode(null);
+        setGameState(null);
+        setHistory(prev => [...prev, { type: 'output', content: 'Game exited. Returning to terminal.' }]);
+        return;
+      }
+      const result = processGuess(cmd.trim());
+      setHistory(prev => [...prev, { type: 'output', content: result }]);
+      return;
+    }
 
     // Handle special commands
     if (command === "clear") {
@@ -1229,39 +1164,38 @@ Type 'q' during any game to quit back to terminal.
       return
     }
 
+    // Handle resume download commands
+    if (command === "resume" || command === "download-resume") {
+      downloadResume()
+    }
+
     // Handle game commands
     if (command === "games") {
-      setHistory((prev) => [...prev, { type: "output", content: getGamesMenu() }])
+      setHistory((prev) => [...prev, { type: "output", content: getGamesList() }])
       return
     }
 
     if (command === "snake") {
-      const snakeState = initSnakeGame();
-      setCurrentGame('snake');
-      setGameState(snakeState);
-      setHistory((prev) => [...prev, { type: "output", content: renderSnakeGame(snakeState) }])
-      return
-    }
-
-    if (command === "2048") {
-      const game2048State = init2048Game();
-      setCurrentGame('2048');
-      setGameState(game2048State);
-      setHistory((prev) => [...prev, { type: "output", content: render2048Game(game2048State) }])
+      const output = startSnakeGame();
+      setHistory((prev) => [...prev, { type: "output", content: output }])
       return
     }
 
     if (command === "guess") {
-      const guessState = initGuessGame();
-      setCurrentGame('guess');
-      setGameState(guessState);
-      setHistory((prev) => [...prev, { type: "output", content: renderGuessGame(guessState) }])
+      const output = startGuessingGame();
+      setHistory((prev) => [...prev, { type: "output", content: output }])
       return
     }
 
-    // Handle resume download commands
-    if (command === "resume" || command === "download-resume") {
-      downloadResume()
+    if (command === "hack") {
+      const output = startHackSimulator();
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
+    if (command === "tetris" || command === "maze") {
+      setHistory((prev) => [...prev, { type: "output", content: `${command.toUpperCase()} - Coming Soon!\n\nThis game is still under development.\nFor now, try 'snake', 'guess', or 'hack'!\n\nType 'games' to see all available games.` }])
+      return
     }
 
     // Check if command exists in static commands
@@ -1315,9 +1249,7 @@ Type 'q' during any game to quit back to terminal.
 
         {/* Current input line */}
         <div className="flex items-center">
-          <span className="text-[#00FF41] mr-2">
-            {currentGame ? `[${currentGame.toUpperCase()}]>` : `riaz@portfolio:${currentDir === '/' ? '~' : currentDir}$`}
-          </span>
+          <span className="text-[#00FF41] mr-2">riaz@portfolio:{currentDir === '/' ? '~' : currentDir}$</span>
           <input
             ref={inputRef}
             type="text"
