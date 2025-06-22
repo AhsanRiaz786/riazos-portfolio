@@ -48,7 +48,8 @@ import {
   StickyNote,
   X,
   Maximize2,
-  Minimize2
+  Minimize2,
+  FileDown
 } from "lucide-react"
 import DesktopIcon from "./desktop-icon"
 import Window from "./window"
@@ -123,6 +124,12 @@ const desktopIcons = [
     label: "SECURE_CONNECTION",
     description: "Establish Contact Protocol",
     icon: <Shield size={24} strokeWidth={1.5} />,
+  },
+  {
+    id: "resume",
+    label: "RESUME.pdf",
+    description: "Professional Resume - Click to Download",
+    icon: <FileDown size={24} strokeWidth={1.5} />,
   },
 ]
 
@@ -1001,6 +1008,15 @@ export default function Desktop() {
   }, [])
 
   const openWindow = (windowId: string) => {
+    if (windowId === "resume") {
+      // Create download link for resume
+      const link = document.createElement('a')
+      link.href = '/Ahsan Riaz - Resume.pdf'
+      link.download = 'Ahsan_Riaz_Resume.pdf'
+      link.click()
+      return
+    }
+    
     if (!openWindows.includes(windowId)) {
       setOpenWindows((prev) => [...prev, windowId])
     }
@@ -1083,6 +1099,7 @@ export default function Desktop() {
       case "chronos":
       case "readme":
       case "contact":
+      case "resume":
         openWindow(action)
         break
       case "restart":

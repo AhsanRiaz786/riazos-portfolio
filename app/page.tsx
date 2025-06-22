@@ -1,5 +1,6 @@
 "use client"
 
+// RiazOS Portfolio - Auto-deployment test
 import { useState, useEffect } from "react"
 import BootSequence from "@/components/boot-sequence"
 import Desktop from "@/components/desktop"

@@ -14,6 +14,9 @@ skills                  - List technical skills
 projects               - Show project portfolio
 experience             - Professional timeline
 contact --secure       - Get contact information
+resume                 - Download professional resume
+download-resume        - Download resume (alias)
+cat resume.pdf         - View resume info & download
 neofetch              - System information
 clear                 - Clear terminal
 whoami                - Current user info
@@ -118,12 +121,13 @@ Current user: Ahsan Riaz
 Role: Full-Stack Developer & Problem Solver
 Status: Online and ready to build amazing things`,
 
-  ls: `total 6
+  ls: `total 7
 drwxr-xr-x  2 ahsan ahsan 4096 Dec 15 10:00 projects/
 drwxr-xr-x  2 ahsan ahsan 4096 Dec 15 10:00 skills/
 -rw-r--r--  1 ahsan ahsan 2048 Dec 15 10:00 README.md
 -rw-r--r--  1 ahsan ahsan 1024 Dec 15 10:00 contact.txt
--rw-r--r--  1 ahsan ahsan  512 Dec 15 10:00 resume.pdf`,
+-rw-r--r--  1 ahsan ahsan 1157 Dec 15 10:00 resume.pdf
+-rw-r--r--  1 ahsan ahsan  256 Dec 15 10:00 download.sh`,
 
   "contact --secure": `ESTABLISHING SECURE CONNECTION...
 ENCRYPTION: AES-256 ✓
@@ -180,6 +184,75 @@ Subject: "Priority Project Discussion"
 
 I respond to priority inquiries within 2-4 hours.
 Let's build something amazing together! 🚀`,
+
+  resume: `INITIATING RESUME DOWNLOAD...
+
+┌─────────────────────────────────────────┐
+│            📄 RESUME.PDF                │
+├─────────────────────────────────────────┤
+│ File: Ahsan_Riaz_Resume.pdf            │
+│ Size: 1.1 MB                           │
+│ Format: PDF (Professional)             │
+│ Last Updated: December 2024            │
+│                                         │
+│ Contains:                               │
+│ ✓ Professional Experience               │
+│ ✓ Technical Skills & Expertise         │
+│ ✓ Education & Certifications           │
+│ ✓ Project Portfolio                    │
+│ ✓ Contact Information                  │
+└─────────────────────────────────────────┘
+
+🔗 Download starting automatically...
+💡 Tip: Open with any PDF viewer
+
+Status: DOWNLOAD_COMPLETE ✅`,
+
+  "download-resume": `RESUME DOWNLOAD INITIATED...
+
+Accessing: /home/ahsan/documents/resume.pdf
+File permissions: -rw-r--r--
+Owner: ahsan (Full-Stack Developer)
+Group: developers
+Size: 1157kb
+
+🚀 Downloading Ahsan_Riaz_Resume.pdf...
+📥 Download complete! Check your downloads folder.
+
+Happy hiring! 😊`,
+
+  "cat resume.pdf": `FILE: resume.pdf
+TYPE: Professional Resume (PDF)
+ENCODING: Binary
+STATUS: ✅ READABLE
+
+┌────────────────────────────────────────────┐
+│        AHSAN RIAZ - FULL-STACK DEV         │
+├────────────────────────────────────────────┤
+│                                            │
+│  📧 ahsanriaz8000@gmail.com               │
+│  📱 +92 304 094 9380                      │
+│  🔗 linkedin.com/in/ahsan-riaz-1254992a3  │
+│  💻 github.com/ahsanriaz786               │
+│                                            │
+│  🎓 BSCS @ NUST (Sophomore)               │
+│  🏆 Top Rated on Upwork (100% Success)    │
+│  💼 1.5+ Years Development Experience      │
+│                                            │
+│  CORE_STACK:                              │
+│  ▸ Frontend: React, Next.js, TypeScript   │
+│  ▸ Backend: Node.js, Python, Django       │
+│  ▸ Data: Web Scraping, Automation         │
+│  ▸ Cloud: AWS, Docker, CI/CD              │
+│                                            │
+│  RECENT_PROJECTS:                          │
+│  ▸ Giraph AI Platform (2024-Current)      │
+│  ▸ RevAutoSale Backend (Enterprise)       │
+│  ▸ Multi-Site Auction Scraper             │
+│                                            │
+└────────────────────────────────────────────┘
+
+📥 To download the full PDF resume, type: resume`,
 }
 
 export default function Terminal() {
@@ -199,6 +272,13 @@ export default function Terminal() {
     }
   }, [history])
 
+  const downloadResume = () => {
+    const link = document.createElement('a')
+    link.href = '/Ahsan Riaz - Resume.pdf'
+    link.download = 'Ahsan_Riaz_Resume.pdf'
+    link.click()
+  }
+
   const handleCommand = (cmd: string) => {
     const trimmedCmd = cmd.trim().toLowerCase()
 
@@ -211,6 +291,11 @@ export default function Terminal() {
     if (trimmedCmd === "clear") {
       setHistory([])
       return
+    }
+
+    // Handle resume download commands
+    if (trimmedCmd === "resume" || trimmedCmd === "download-resume") {
+      downloadResume()
     }
 
     // Check if command exists

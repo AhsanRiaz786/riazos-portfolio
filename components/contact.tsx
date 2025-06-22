@@ -8,7 +8,8 @@ import {
   DollarSign, 
   Phone,
   Shield,
-  Check
+  Check,
+  FileDown
 } from "lucide-react"
 
 export default function Contact() {
@@ -67,6 +68,20 @@ export default function Contact() {
       responseTime: "Urgent Projects Only",
       icon: <Phone size={20} strokeWidth={1.5} className="text-[#FF00F7]" />,
       action: () => window.open("tel:+923040949380"),
+    },
+    {
+      id: "resume",
+      name: "DOWNLOAD_RESUME",
+      address: "Ahsan_Riaz_Resume.pdf",
+      protocol: "PDF Document",
+      responseTime: "Instant Download",
+      icon: <FileDown size={20} strokeWidth={1.5} className="text-[#FFD700]" />,
+      action: () => {
+        const link = document.createElement('a')
+        link.href = '/Ahsan Riaz - Resume.pdf'
+        link.download = 'Ahsan_Riaz_Resume.pdf'
+        link.click()
+      },
     },
   ]
 
