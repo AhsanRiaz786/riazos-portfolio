@@ -16,12 +16,13 @@ experience             - Professional timeline
 contact --secure       - Get contact information
 resume                 - Download professional resume
 download-resume        - Download resume (alias)
-cat resume.pdf         - View resume info & download
 neofetch              - System information
 clear                 - Clear terminal
 whoami                - Current user info
 ls                    - List directory contents
 cat [filename]        - Display file contents
+cd [directory]        - Change directory
+pwd                   - Show current directory
 easter_egg            - Find the hidden surprise`,
 
   about: `NAME: Ahsan Riaz
@@ -121,13 +122,37 @@ Current user: Ahsan Riaz
 Role: Full-Stack Developer & Problem Solver
 Status: Online and ready to build amazing things`,
 
-  ls: `total 7
-drwxr-xr-x  2 ahsan ahsan 4096 Dec 15 10:00 projects/
-drwxr-xr-x  2 ahsan ahsan 4096 Dec 15 10:00 skills/
--rw-r--r--  1 ahsan ahsan 2048 Dec 15 10:00 README.md
--rw-r--r--  1 ahsan ahsan 1024 Dec 15 10:00 contact.txt
--rw-r--r--  1 ahsan ahsan 1157 Dec 15 10:00 resume.pdf
--rw-r--r--  1 ahsan ahsan  256 Dec 15 10:00 download.sh`,
+  pwd: (currentDir: string) => `${currentDir}`,
+  
+  ls: (currentDir: string) => {
+    const getCurrentFiles = (path: string) => {
+      const dirs = path.split('/').filter(Boolean);
+      let current = fileSystem['/'];
+      
+      for (const dir of dirs) {
+        if (current.files && current.files[dir] && current.files[dir].type === 'directory') {
+          current = current.files[dir] as any;
+        }
+      }
+      
+      if (!current.files) return 'No files found';
+      
+      const files = Object.entries(current.files);
+      let output = `total ${files.length}\n`;
+      
+      files.forEach(([name, file]) => {
+        const isDir = file.type === 'directory';
+        const permissions = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+        const size = isDir ? '4096' : Math.floor(Math.random() * 2048 + 512);
+        const displayName = isDir ? `${name}/` : name;
+        output += `${permissions}  2 ahsan ahsan ${size} Dec 15 10:00 ${displayName}\n`;
+      });
+      
+      return output.trim();
+    };
+    
+    return getCurrentFiles(currentDir);
+  },
 
   "contact --secure": `ESTABLISHING SECURE CONNECTION...
 ENCRYPTION: AES-256 ✓
@@ -255,6 +280,270 @@ STATUS: [OK] READABLE
 >> To download the full PDF resume, type: resume`,
 }
 
+// File system structure
+const fileSystem = {
+  '/': {
+    type: 'directory',
+    files: {
+      'README.md': {
+        type: 'file',
+        content: `# Ahsan Riaz - Portfolio
+
+Welcome to my interactive portfolio terminal!
+
+## About This System
+This portfolio showcases my skills as a Full-Stack Developer through an interactive terminal interface. Navigate through different sections to learn more about my experience, projects, and technical expertise.
+
+## Quick Navigation
+- Use 'about' for personal introduction
+- Use 'skills' to see technical capabilities  
+- Use 'projects' for portfolio overview
+- Use 'experience' for professional timeline
+- Use 'contact --secure' for contact information
+- Use 'resume' to download my professional resume
+
+## File System
+- projects/ - Detailed project case studies
+- skills/ - Technical skill breakdowns
+- contact.txt - Contact information
+- resume.pdf - Professional resume
+- download.sh - Resume download script
+
+Built with: React, TypeScript, Next.js, Tailwind CSS
+Author: Ahsan Riaz <ahsanriaz8000@gmail.com>
+License: Portfolio Use Only`
+      },
+      'contact.txt': {
+        type: 'file',
+        content: `CONTACT INFORMATION
+==================
+
+NAME: Ahsan Riaz
+ROLE: Full-Stack Developer & Automation Engineer
+LOCATION: Faisalabad/Islamabad, Pakistan
+
+EMAIL: ahsanriaz8000@gmail.com
+PHONE: +92 304 094 9380
+LINKEDIN: https://www.linkedin.com/in/ahsan-riaz-1254992a3
+GITHUB: https://github.com/ahsanriaz786
+UPWORK: https://www.upwork.com/freelancers/~01d4988598a9368ee5
+
+STATUS: Available for Projects
+RESPONSE TIME: < 24 hours
+SUCCESS RATE: 100% (Upwork Top Rated)
+
+For secure communication, use: contact --secure`
+      },
+      'resume.pdf': {
+        type: 'file',
+        content: 'cat resume.pdf'
+      },
+      'download.sh': {
+        type: 'file',
+        content: `#!/bin/bash
+# Resume Download Script
+# Author: Ahsan Riaz
+
+echo "Initiating resume download..."
+echo "File: Ahsan_Riaz_Resume.pdf"
+echo "Size: 1.1 MB"
+echo "Format: PDF (Professional)"
+
+# Trigger download
+curl -O "https://portfolio.ahsanriaz.dev/resume.pdf"
+
+echo "Download complete!"
+echo "Happy hiring! [SUCCESS]"`
+      },
+      'projects': {
+        type: 'directory',
+        files: {
+          'giraph_ai.md': {
+            type: 'file',
+            content: `# Giraph AI Platform
+**Status:** DEPLOYED | **Tech:** Next.js, React, Node.js, MongoDB, Gemini AI
+
+## Overview
+AI-powered data analytics platform that makes data analysis accessible to everyone.
+
+## The Challenge
+Small businesses were drowning in spreadsheets, spending hours trying to make sense of their data. They needed insights, not more confusion.
+
+## My Solution
+Built a platform that speaks human, not just code. Users upload messy Excel files, and AI figures out what story the data wants to tell.
+
+## Key Features
+- AI-powered data interpretation
+- Automated visualization generation
+- Natural language insights
+- Real-time collaboration tools
+- Export capabilities
+
+## Technical Implementation
+- Frontend: Next.js with TypeScript
+- Backend: Node.js with Express
+- Database: MongoDB with aggregation pipelines
+- AI: Google Gemini API integration
+- Deployment: AWS with CI/CD
+
+## Impact
+Turned 2-hour analysis sessions into 2-minute discoveries. Business owners now actually look forward to checking their metrics.
+
+## Live Demo
+Visit: https://giraph.ai (Currently in beta)`
+          },
+          'auction_scraper.md': {
+            type: 'file',
+            content: `# Multi-Site Auction Scraper
+**Status:** PRODUCTION | **Tech:** Python, PyQt5, Selenium, Multi-threading
+
+## Overview
+High-performance scraping system monitoring car auction sites 24/7.
+
+## Challenge
+Manually tracking vehicle listings across multiple auction platforms was time-consuming and error-prone.
+
+## Solution
+Built automated scraper handling 10,000+ daily listings with real-time processing.
+
+## Technical Features
+- Multi-threaded architecture
+- Rate limiting and proxy rotation
+- Data validation and cleaning
+- Real-time notifications
+- Database synchronization
+
+## Performance Metrics
+- 10,000+ listings processed daily
+- 99.9% uptime
+- Sub-second response times
+- Zero data loss incidents
+
+## Technologies Used
+- Python with asyncio
+- Selenium WebDriver
+- PyQt5 for GUI
+- MySQL for data storage
+- Redis for caching`
+          },
+          'revautosale.md': {
+            type: 'file',
+            content: `# RevAutoSale Backend API
+**Status:** LIVE | **Tech:** Django, MySQL, Scrapy, REST Framework
+
+## Overview
+Enterprise-grade inventory management API serving 100k+ vehicle records.
+
+## Key Features
+- RESTful API design
+- Sub-100ms response times
+- Automated data cleaning
+- Real-time synchronization
+- Comprehensive documentation
+
+## Architecture
+- Django REST Framework
+- MySQL with optimized indexes
+- Redis for caching
+- Celery for background tasks
+- AWS deployment
+
+## Performance
+- 100k+ vehicle records managed
+- 500+ API requests per minute
+- 99.9% uptime maintained
+- Zero security incidents
+
+## API Endpoints
+- GET /api/vehicles/
+- POST /api/vehicles/
+- PUT /api/vehicles/{id}/
+- DELETE /api/vehicles/{id}/
+- GET /api/search/?q={query}`
+          }
+        }
+      },
+      'skills': {
+        type: 'directory',
+        files: {
+          'languages.txt': {
+            type: 'file',
+            content: `PROGRAMMING LANGUAGES
+====================
+
+Python        [████████░░] 85%
+JavaScript    [████████░░] 80%
+TypeScript    [███████░░░] 75%
+Java          [██████░░░░] 70%
+SQL           [████████░░] 80%
+
+DETAILS:
+--------
+Python: Web scraping, automation, Django, Flask, FastAPI
+JavaScript: React, Node.js, Express, vanilla JS
+TypeScript: Type-safe React apps, API development
+Java: Object-oriented programming, Spring basics
+SQL: MySQL, PostgreSQL, complex queries, optimization`
+          },
+          'frameworks.txt': {
+            type: 'file',
+            content: `FRAMEWORKS & TOOLS
+==================
+
+Frontend:
+- React.js (Advanced)
+- Next.js (Advanced)
+- Tailwind CSS (Expert)
+- Material-UI (Intermediate)
+- HTML5/CSS3 (Expert)
+
+Backend:
+- Node.js + Express (Advanced)
+- Django (Advanced)
+- Flask (Intermediate)
+- FastAPI (Intermediate)
+
+Data & Automation:
+- Scrapy (Expert)
+- Selenium (Advanced)
+- Pandas (Advanced)
+- BeautifulSoup (Expert)
+
+Cloud & DevOps:
+- AWS (EC2, S3, App Runner)
+- Docker (Intermediate)
+- Firebase (Intermediate)
+- Git/GitHub (Advanced)`
+          },
+          'databases.txt': {
+            type: 'file',
+            content: `DATABASE TECHNOLOGIES
+====================
+
+Relational:
+- MySQL (Advanced)
+- PostgreSQL (Intermediate)
+- SQLite (Advanced)
+
+NoSQL:
+- MongoDB (Advanced)
+- Redis (Intermediate)
+- Firebase Firestore (Basic)
+
+Skills:
+- Database design and optimization
+- Complex query writing
+- Index optimization
+- Data migration
+- Backup and recovery
+- Performance tuning`
+          }
+        }
+      }
+    }
+  }
+};
+
 export default function Terminal() {
   const [history, setHistory] = useState<Array<{ type: "command" | "output"; content: string }>>([
     { type: "output", content: "RiazOS Terminal v1.0 - Welcome to the system" },
@@ -263,6 +552,7 @@ export default function Terminal() {
   const [currentInput, setCurrentInput] = useState("")
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+  const [currentDir, setCurrentDir] = useState('/')
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -279,30 +569,121 @@ export default function Terminal() {
     link.click()
   }
 
-  const handleCommand = (cmd: string) => {
-    const trimmedCmd = cmd.trim().toLowerCase()
+  const getFileContent = (path: string, filename: string): string => {
+    const dirs = path.split('/').filter(Boolean);
+    let current = fileSystem['/'];
+    
+    for (const dir of dirs) {
+      if (current.files && current.files[dir] && current.files[dir].type === 'directory') {
+        current = current.files[dir] as any;
+      }
+    }
+    
+    if (current.files && current.files[filename]) {
+      const file = current.files[filename];
+      if (file.type === 'file') {
+        // Special handling for resume.pdf
+        if (filename === 'resume.pdf') {
+          return commands["cat resume.pdf"];
+        }
+        return file.content;
+      } else {
+        return `cat: ${filename}: Is a directory`;
+      }
+    }
+    
+    return `cat: ${filename}: No such file or directory`;
+  };
 
-    // Add command to history
-    setHistory((prev) => [...prev, { type: "command", content: `riaz@portfolio:~$ ${cmd}` }])
+  const changeDirectory = (currentPath: string, targetDir: string): { newPath: string; error?: string } => {
+    if (targetDir === '..') {
+      const parts = currentPath.split('/').filter(Boolean);
+      if (parts.length === 0) return { newPath: '/' };
+      parts.pop();
+      return { newPath: '/' + parts.join('/') };
+    }
+    
+    if (targetDir === '/' || targetDir === '~') {
+      return { newPath: '/' };
+    }
+    
+    const dirs = currentPath.split('/').filter(Boolean);
+    let current = fileSystem['/'];
+    
+    for (const dir of dirs) {
+      if (current.files && current.files[dir] && current.files[dir].type === 'directory') {
+        current = current.files[dir] as any;
+      }
+    }
+    
+    if (current.files && current.files[targetDir] && current.files[targetDir].type === 'directory') {
+      const newPath = currentPath === '/' ? `/${targetDir}` : `${currentPath}/${targetDir}`;
+      return { newPath };
+    }
+    
+    return { newPath: currentPath, error: `cd: ${targetDir}: No such file or directory` };
+  };
+
+  const handleCommand = (cmd: string) => {
+    const parts = cmd.trim().split(' ');
+    const command = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    // Add command to history with current directory
+    const prompt = `riaz@portfolio:${currentDir === '/' ? '~' : currentDir}$`;
+    setHistory((prev) => [...prev, { type: "command", content: `${prompt} ${cmd}` }])
     setCommandHistory((prev) => [...prev, cmd])
     setHistoryIndex(-1)
 
     // Handle special commands
-    if (trimmedCmd === "clear") {
+    if (command === "clear") {
       setHistory([])
       return
     }
 
+    if (command === "pwd") {
+      setHistory((prev) => [...prev, { type: "output", content: currentDir }])
+      return
+    }
+
+    if (command === "ls") {
+      const output = commands.ls(currentDir);
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
+    if (command === "cd") {
+      const targetDir = args[0] || '/';
+      const result = changeDirectory(currentDir, targetDir);
+      if (result.error) {
+        setHistory((prev) => [...prev, { type: "output", content: result.error }])
+      } else {
+        setCurrentDir(result.newPath);
+      }
+      return
+    }
+
+    if (command === "cat") {
+      const filename = args[0];
+      if (!filename) {
+        setHistory((prev) => [...prev, { type: "output", content: "cat: missing file operand" }])
+        return
+      }
+      const content = getFileContent(currentDir, filename);
+      setHistory((prev) => [...prev, { type: "output", content: content }])
+      return
+    }
+
     // Handle resume download commands
-    if (trimmedCmd === "resume" || trimmedCmd === "download-resume") {
+    if (command === "resume" || command === "download-resume") {
       downloadResume()
     }
 
-    // Check if command exists
+    // Check if command exists in static commands
+    const staticCommand = cmd.trim().toLowerCase();
     const output =
-      commands[trimmedCmd as keyof typeof commands] ||
-      commands[cmd.trim() as keyof typeof commands] ||
-      `Command not found: ${cmd}. Type 'help' for available commands.`
+      commands[staticCommand as keyof typeof commands] ||
+      `Command not found: ${command}. Type 'help' for available commands.`
 
     setHistory((prev) => [...prev, { type: "output", content: output }])
   }
@@ -349,7 +730,7 @@ export default function Terminal() {
 
         {/* Current input line */}
         <div className="flex items-center">
-          <span className="text-[#00FF41] mr-2">riaz@portfolio:~$</span>
+          <span className="text-[#00FF41] mr-2">riaz@portfolio:{currentDir === '/' ? '~' : currentDir}$</span>
           <input
             ref={inputRef}
             type="text"
