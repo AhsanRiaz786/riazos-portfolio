@@ -25,7 +25,7 @@ export default function DesktopIcon({ label, description, icon, onClick, style }
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`w-16 h-16 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
+        className={`w-14 h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
           isHovered
             ? "border-[#FF00F7] shadow-lg shadow-[#FF00F7]/30 scale-110 text-[#FF00F7]"
             : "border-[#00FF41] shadow-md shadow-[#00FF41]/20 text-[#00FF41]"
@@ -33,7 +33,7 @@ export default function DesktopIcon({ label, description, icon, onClick, style }
       >
         {icon}
       </div>
-      <div className="mt-2 text-[#00FF41] font-mono text-xs text-center max-w-20 leading-tight">{label}</div>
+      <div className="mt-1.5 text-[#00FF41] font-mono text-xs text-center max-w-20 leading-tight">{label}</div>
 
       {isHovered && (
         <div className="absolute left-20 top-0 bg-[#141414] border border-[#00FF41] rounded p-2 text-[#E5E5E5] font-mono text-xs whitespace-nowrap z-50">

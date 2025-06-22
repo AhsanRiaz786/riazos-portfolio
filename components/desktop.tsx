@@ -93,43 +93,43 @@ const desktopIcons = [
     id: "process-manager",
     label: "//PROCESS_MANAGER",
     description: "Active Projects & Live Systems",
-    icon: <Activity size={24} strokeWidth={1.5} />,
+    icon: <Activity size={22} strokeWidth={1.5} />,
   },
   {
     id: "tech-stack",
     label: "/tech_stack",
     description: "Tools, Languages & Frameworks",
-    icon: <FolderOpen size={24} strokeWidth={1.5} />,
+    icon: <FolderOpen size={22} strokeWidth={1.5} />,
   },
   {
     id: "chronos",
     label: "CHRONOS.log",
     description: "Professional Journey & Experience",
-    icon: <History size={24} strokeWidth={1.5} />,
+    icon: <History size={22} strokeWidth={1.5} />,
   },
   {
     id: "readme",
     label: "README.md",
     description: "About the Human Behind the Code",
-    icon: <FileText size={24} strokeWidth={1.5} />,
+    icon: <FileText size={22} strokeWidth={1.5} />,
   },
   {
     id: "terminal",
     label: "TERMINAL",
     description: "Direct System Access",
-    icon: <TerminalIcon size={24} strokeWidth={1.5} />,
+    icon: <TerminalIcon size={22} strokeWidth={1.5} />,
   },
   {
     id: "contact",
     label: "SECURE_CONNECTION",
     description: "Establish Contact Protocol",
-    icon: <Shield size={24} strokeWidth={1.5} />,
+    icon: <Shield size={22} strokeWidth={1.5} />,
   },
   {
     id: "resume",
     label: "RESUME.pdf",
     description: "Professional Resume - Click to Download",
-    icon: <FileDown size={24} strokeWidth={1.5} />,
+    icon: <FileDown size={22} strokeWidth={1.5} />,
   },
 ]
 
@@ -1145,7 +1145,7 @@ export default function Desktop() {
       <MatrixRain />
 
       {/* Desktop Icons */}
-      <div className="absolute left-8 top-8 space-y-4 z-10">
+      <div className="absolute left-8 top-8 space-y-3 z-10">
         {desktopIcons.map((icon, index) => (
           <DesktopIcon
             key={icon.id}
