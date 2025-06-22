@@ -145,18 +145,18 @@ export default function BootSequence({ onBootComplete }: BootSequenceProps) {
           return
         }
 
-        let charIndex = 0
+      let charIndex = 0
         setCurrentText("")
 
         const typeChar = () => {
-          if (charIndex <= message.length) {
-            setCurrentText(message.slice(0, charIndex))
-            charIndex++
+        if (charIndex <= message.length) {
+          setCurrentText(message.slice(0, charIndex))
+          charIndex++
             
             // Typing speed
             const delay = message.includes("RIAZ.OS") ? 60 : 45
             timeouts.push(setTimeout(typeChar, delay))
-          } else {
+        } else {
             // Message complete, add to displayed messages
             setDisplayedMessages(prev => [...prev, message])
             setCurrentText("")
@@ -164,11 +164,11 @@ export default function BootSequence({ onBootComplete }: BootSequenceProps) {
             
             // Pause between messages
             timeouts.push(setTimeout(typeNextMessage, 600))
-          }
         }
+      }
 
         typeChar()
-      }
+    }
 
       typeNextMessage()
     }
@@ -196,8 +196,8 @@ export default function BootSequence({ onBootComplete }: BootSequenceProps) {
   }, []) // Empty dependency array - runs only once
 
   const handleInteraction = () => {
-    onBootComplete()
-  }
+      onBootComplete()
+    }
 
   const handleSkip = () => {
     setPhase("complete")
@@ -286,7 +286,7 @@ export default function BootSequence({ onBootComplete }: BootSequenceProps) {
             currentText.includes("ready") ? "text-cyan-400" :
             "text-[#00FF41]"
           } ${isMobile ? 'text-sm' : ''}`}>
-            {currentText}
+          {currentText}
             {showCursor && <span className="animate-pulse bg-[#00FF41] text-black">_</span>}
           </div>
         )}
@@ -297,7 +297,7 @@ export default function BootSequence({ onBootComplete }: BootSequenceProps) {
             <div className="text-blue-400 animate-pulse">
               {`${'█'.repeat(Math.floor(progressValue / 4))}${'░'.repeat(25 - Math.floor(progressValue / 4))} ${progressValue}%`}
             </div>
-          </div>
+        </div>
         )}
 
         {/* Completion prompt */}
