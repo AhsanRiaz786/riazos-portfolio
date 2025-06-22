@@ -183,12 +183,12 @@ Direct Line: ahsanriaz8000@gmail.com
 Subject: "Priority Project Discussion"
 
 I respond to priority inquiries within 2-4 hours.
-Let's build something amazing together! 🚀`,
+Let's build something amazing together! [READY]`,
 
   resume: `INITIATING RESUME DOWNLOAD...
 
 ┌─────────────────────────────────────────┐
-│            📄 RESUME.PDF                │
+│            [PDF] RESUME.PDF             │
 ├─────────────────────────────────────────┤
 │ File: Ahsan_Riaz_Resume.pdf            │
 │ Size: 1.1 MB                           │
@@ -196,17 +196,17 @@ Let's build something amazing together! 🚀`,
 │ Last Updated: December 2024            │
 │                                         │
 │ Contains:                               │
-│ ✓ Professional Experience               │
-│ ✓ Technical Skills & Expertise         │
-│ ✓ Education & Certifications           │
-│ ✓ Project Portfolio                    │
-│ ✓ Contact Information                  │
+│ [x] Professional Experience             │
+│ [x] Technical Skills & Expertise       │
+│ [x] Education & Certifications         │
+│ [x] Project Portfolio                  │
+│ [x] Contact Information                │
 └─────────────────────────────────────────┘
 
-🔗 Download starting automatically...
-💡 Tip: Open with any PDF viewer
+>> Download starting automatically...
+>> Tip: Open with any PDF viewer
 
-Status: DOWNLOAD_COMPLETE ✅`,
+Status: DOWNLOAD_COMPLETE [OK]`,
 
   "download-resume": `RESUME DOWNLOAD INITIATED...
 
@@ -216,43 +216,43 @@ Owner: ahsan (Full-Stack Developer)
 Group: developers
 Size: 1157kb
 
-🚀 Downloading Ahsan_Riaz_Resume.pdf...
-📥 Download complete! Check your downloads folder.
+>> Downloading Ahsan_Riaz_Resume.pdf...
+>> Download complete! Check your downloads folder.
 
-Happy hiring! 😊`,
+Happy hiring! [SUCCESS]`,
 
   "cat resume.pdf": `FILE: resume.pdf
 TYPE: Professional Resume (PDF)
 ENCODING: Binary
-STATUS: ✅ READABLE
+STATUS: [OK] READABLE
 
 ┌────────────────────────────────────────────┐
 │        AHSAN RIAZ - FULL-STACK DEV         │
 ├────────────────────────────────────────────┤
 │                                            │
-│  📧 ahsanriaz8000@gmail.com               │
-│  📱 +92 304 094 9380                      │
-│  🔗 linkedin.com/in/ahsan-riaz-1254992a3  │
-│  💻 github.com/ahsanriaz786               │
+│  [EMAIL] ahsanriaz8000@gmail.com          │
+│  [PHONE] +92 304 094 9380                 │
+│  [WEB] linkedin.com/in/ahsan-riaz-1254992a3 │
+│  [CODE] github.com/ahsanriaz786           │
 │                                            │
-│  🎓 BSCS @ NUST (Sophomore)               │
-│  🏆 Top Rated on Upwork (100% Success)    │
-│  💼 1.5+ Years Development Experience      │
+│  [EDU] BSCS @ NUST (Sophomore)            │
+│  [RANK] Top Rated on Upwork (100% Success) │
+│  [EXP] 1.5+ Years Development Experience  │
 │                                            │
 │  CORE_STACK:                              │
-│  ▸ Frontend: React, Next.js, TypeScript   │
-│  ▸ Backend: Node.js, Python, Django       │
-│  ▸ Data: Web Scraping, Automation         │
-│  ▸ Cloud: AWS, Docker, CI/CD              │
+│  > Frontend: React, Next.js, TypeScript   │
+│  > Backend: Node.js, Python, Django       │
+│  > Data: Web Scraping, Automation         │
+│  > Cloud: AWS, Docker, CI/CD              │
 │                                            │
 │  RECENT_PROJECTS:                          │
-│  ▸ Giraph AI Platform (2024-Current)      │
-│  ▸ RevAutoSale Backend (Enterprise)       │
-│  ▸ Multi-Site Auction Scraper             │
+│  > Giraph AI Platform (2024-Current)      │
+│  > RevAutoSale Backend (Enterprise)       │
+│  > Multi-Site Auction Scraper             │
 │                                            │
 └────────────────────────────────────────────┘
 
-📥 To download the full PDF resume, type: resume`,
+>> To download the full PDF resume, type: resume`,
 }
 
 export default function Terminal() {
