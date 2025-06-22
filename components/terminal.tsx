@@ -16,12 +16,21 @@ experience             - Professional timeline
 contact --secure       - Get contact information
 resume                 - Download professional resume
 download-resume        - Download resume (alias)
-cat resume.pdf         - View resume info & download
 neofetch              - System information
 clear                 - Clear terminal
 whoami                - Current user info
 ls                    - List directory contents
 cat [filename]        - Display file contents
+cd [directory]        - Change directory
+pwd                   - Show current directory
+git status            - Show portfolio git status
+git log               - Show recent commits
+git branch            - Show active branches
+git activity          - Show recent GitHub activity
+games                 - List available games
+snake                 - Play Snake game
+guess                 - Number guessing game
+hack                  - Hacker simulator
 easter_egg            - Find the hidden surprise`,
 
   about: `NAME: Ahsan Riaz
@@ -121,13 +130,37 @@ Current user: Ahsan Riaz
 Role: Full-Stack Developer & Problem Solver
 Status: Online and ready to build amazing things`,
 
-  ls: `total 7
-drwxr-xr-x  2 ahsan ahsan 4096 Dec 15 10:00 projects/
-drwxr-xr-x  2 ahsan ahsan 4096 Dec 15 10:00 skills/
--rw-r--r--  1 ahsan ahsan 2048 Dec 15 10:00 README.md
--rw-r--r--  1 ahsan ahsan 1024 Dec 15 10:00 contact.txt
--rw-r--r--  1 ahsan ahsan 1157 Dec 15 10:00 resume.pdf
--rw-r--r--  1 ahsan ahsan  256 Dec 15 10:00 download.sh`,
+  pwd: (currentDir: string) => `${currentDir}`,
+  
+  ls: (currentDir: string) => {
+    const getCurrentFiles = (path: string) => {
+      const dirs = path.split('/').filter(Boolean);
+      let current = fileSystem['/'];
+      
+      for (const dir of dirs) {
+        if (current.files && current.files[dir] && current.files[dir].type === 'directory') {
+          current = current.files[dir] as any;
+        }
+      }
+      
+      if (!current.files) return 'No files found';
+      
+      const files = Object.entries(current.files);
+      let output = `total ${files.length}\n`;
+      
+      files.forEach(([name, file]) => {
+        const isDir = file.type === 'directory';
+        const permissions = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+        const size = isDir ? '4096' : Math.floor(Math.random() * 2048 + 512);
+        const displayName = isDir ? `${name}/` : name;
+        output += `${permissions}  2 ahsan ahsan ${size} Dec 15 10:00 ${displayName}\n`;
+      });
+      
+      return output.trim();
+    };
+    
+    return getCurrentFiles(currentDir);
+  },
 
   "contact --secure": `ESTABLISHING SECURE CONNECTION...
 ENCRYPTION: AES-256 ✓
@@ -183,12 +216,12 @@ Direct Line: ahsanriaz8000@gmail.com
 Subject: "Priority Project Discussion"
 
 I respond to priority inquiries within 2-4 hours.
-Let's build something amazing together! 🚀`,
+Let's build something amazing together! [READY]`,
 
   resume: `INITIATING RESUME DOWNLOAD...
 
 ┌─────────────────────────────────────────┐
-│            📄 RESUME.PDF                │
+│            [PDF] RESUME.PDF             │
 ├─────────────────────────────────────────┤
 │ File: Ahsan_Riaz_Resume.pdf            │
 │ Size: 1.1 MB                           │
@@ -196,17 +229,17 @@ Let's build something amazing together! 🚀`,
 │ Last Updated: December 2024            │
 │                                         │
 │ Contains:                               │
-│ ✓ Professional Experience               │
-│ ✓ Technical Skills & Expertise         │
-│ ✓ Education & Certifications           │
-│ ✓ Project Portfolio                    │
-│ ✓ Contact Information                  │
+│ [x] Professional Experience             │
+│ [x] Technical Skills & Expertise       │
+│ [x] Education & Certifications         │
+│ [x] Project Portfolio                  │
+│ [x] Contact Information                │
 └─────────────────────────────────────────┘
 
-🔗 Download starting automatically...
-💡 Tip: Open with any PDF viewer
+>> Download starting automatically...
+>> Tip: Open with any PDF viewer
 
-Status: DOWNLOAD_COMPLETE ✅`,
+Status: DOWNLOAD_COMPLETE [OK]`,
 
   "download-resume": `RESUME DOWNLOAD INITIATED...
 
@@ -216,44 +249,308 @@ Owner: ahsan (Full-Stack Developer)
 Group: developers
 Size: 1157kb
 
-🚀 Downloading Ahsan_Riaz_Resume.pdf...
-📥 Download complete! Check your downloads folder.
+>> Downloading Ahsan_Riaz_Resume.pdf...
+>> Download complete! Check your downloads folder.
 
-Happy hiring! 😊`,
+Happy hiring! [SUCCESS]`,
 
   "cat resume.pdf": `FILE: resume.pdf
 TYPE: Professional Resume (PDF)
 ENCODING: Binary
-STATUS: ✅ READABLE
+STATUS: [OK] READABLE
 
 ┌────────────────────────────────────────────┐
 │        AHSAN RIAZ - FULL-STACK DEV         │
 ├────────────────────────────────────────────┤
 │                                            │
-│  📧 ahsanriaz8000@gmail.com               │
-│  📱 +92 304 094 9380                      │
-│  🔗 linkedin.com/in/ahsan-riaz-1254992a3  │
-│  💻 github.com/ahsanriaz786               │
+│  [EMAIL] ahsanriaz8000@gmail.com          │
+│  [PHONE] +92 304 094 9380                 │
+│  [WEB] linkedin.com/in/ahsan-riaz-1254992a3 │
+│  [CODE] github.com/ahsanriaz786           │
 │                                            │
-│  🎓 BSCS @ NUST (Sophomore)               │
-│  🏆 Top Rated on Upwork (100% Success)    │
-│  💼 1.5+ Years Development Experience      │
+│  [EDU] BSCS @ NUST (Sophomore)            │
+│  [RANK] Top Rated on Upwork (100% Success) │
+│  [EXP] 1.5+ Years Development Experience  │
 │                                            │
 │  CORE_STACK:                              │
-│  ▸ Frontend: React, Next.js, TypeScript   │
-│  ▸ Backend: Node.js, Python, Django       │
-│  ▸ Data: Web Scraping, Automation         │
-│  ▸ Cloud: AWS, Docker, CI/CD              │
+│  > Frontend: React, Next.js, TypeScript   │
+│  > Backend: Node.js, Python, Django       │
+│  > Data: Web Scraping, Automation         │
+│  > Cloud: AWS, Docker, CI/CD              │
 │                                            │
 │  RECENT_PROJECTS:                          │
-│  ▸ Giraph AI Platform (2024-Current)      │
-│  ▸ RevAutoSale Backend (Enterprise)       │
-│  ▸ Multi-Site Auction Scraper             │
+│  > Giraph AI Platform (2024-Current)      │
+│  > RevAutoSale Backend (Enterprise)       │
+│  > Multi-Site Auction Scraper             │
 │                                            │
 └────────────────────────────────────────────┘
 
-📥 To download the full PDF resume, type: resume`,
+>> To download the full PDF resume, type: resume`,
 }
+
+// File system structure
+const fileSystem = {
+  '/': {
+    type: 'directory',
+    files: {
+      'README.md': {
+        type: 'file',
+        content: `# Ahsan Riaz - Portfolio
+
+Welcome to my interactive portfolio terminal!
+
+## About This System
+This portfolio showcases my skills as a Full-Stack Developer through an interactive terminal interface. Navigate through different sections to learn more about my experience, projects, and technical expertise.
+
+## Quick Navigation
+- Use 'about' for personal introduction
+- Use 'skills' to see technical capabilities  
+- Use 'projects' for portfolio overview
+- Use 'experience' for professional timeline
+- Use 'contact --secure' for contact information
+- Use 'resume' to download my professional resume
+
+## File System
+- projects/ - Detailed project case studies
+- skills/ - Technical skill breakdowns
+- contact.txt - Contact information
+- resume.pdf - Professional resume
+- download.sh - Resume download script
+
+Built with: React, TypeScript, Next.js, Tailwind CSS
+Author: Ahsan Riaz <ahsanriaz8000@gmail.com>
+License: Portfolio Use Only`
+      },
+      'contact.txt': {
+        type: 'file',
+        content: `CONTACT INFORMATION
+==================
+
+NAME: Ahsan Riaz
+ROLE: Full-Stack Developer & Automation Engineer
+LOCATION: Faisalabad/Islamabad, Pakistan
+
+EMAIL: ahsanriaz8000@gmail.com
+PHONE: +92 304 094 9380
+LINKEDIN: https://www.linkedin.com/in/ahsan-riaz-1254992a3
+GITHUB: https://github.com/ahsanriaz786
+UPWORK: https://www.upwork.com/freelancers/~01d4988598a9368ee5
+
+STATUS: Available for Projects
+RESPONSE TIME: < 24 hours
+SUCCESS RATE: 100% (Upwork Top Rated)
+
+For secure communication, use: contact --secure`
+      },
+      'resume.pdf': {
+        type: 'file',
+        content: 'cat resume.pdf'
+      },
+      'download.sh': {
+        type: 'file',
+        content: `#!/bin/bash
+# Resume Download Script
+# Author: Ahsan Riaz
+
+echo "Initiating resume download..."
+echo "File: Ahsan_Riaz_Resume.pdf"
+echo "Size: 1.1 MB"
+echo "Format: PDF (Professional)"
+
+# Trigger download
+curl -O "https://portfolio.ahsanriaz.dev/resume.pdf"
+
+echo "Download complete!"
+echo "Happy hiring! [SUCCESS]"`
+      },
+      'projects': {
+        type: 'directory',
+        files: {
+          'giraph_ai.md': {
+            type: 'file',
+            content: `# Giraph AI Platform
+**Status:** DEPLOYED | **Tech:** Next.js, React, Node.js, MongoDB, Gemini AI
+
+## Overview
+AI-powered data analytics platform that makes data analysis accessible to everyone.
+
+## The Challenge
+Small businesses were drowning in spreadsheets, spending hours trying to make sense of their data. They needed insights, not more confusion.
+
+## My Solution
+Built a platform that speaks human, not just code. Users upload messy Excel files, and AI figures out what story the data wants to tell.
+
+## Key Features
+- AI-powered data interpretation
+- Automated visualization generation
+- Natural language insights
+- Real-time collaboration tools
+- Export capabilities
+
+## Technical Implementation
+- Frontend: Next.js with TypeScript
+- Backend: Node.js with Express
+- Database: MongoDB with aggregation pipelines
+- AI: Google Gemini API integration
+- Deployment: AWS with CI/CD
+
+## Impact
+Turned 2-hour analysis sessions into 2-minute discoveries. Business owners now actually look forward to checking their metrics.
+
+## Live Demo
+Visit: https://giraph.ai (Currently in beta)`
+          },
+          'auction_scraper.md': {
+            type: 'file',
+            content: `# Multi-Site Auction Scraper
+**Status:** PRODUCTION | **Tech:** Python, PyQt5, Selenium, Multi-threading
+
+## Overview
+High-performance scraping system monitoring car auction sites 24/7.
+
+## Challenge
+Manually tracking vehicle listings across multiple auction platforms was time-consuming and error-prone.
+
+## Solution
+Built automated scraper handling 10,000+ daily listings with real-time processing.
+
+## Technical Features
+- Multi-threaded architecture
+- Rate limiting and proxy rotation
+- Data validation and cleaning
+- Real-time notifications
+- Database synchronization
+
+## Performance Metrics
+- 10,000+ listings processed daily
+- 99.9% uptime
+- Sub-second response times
+- Zero data loss incidents
+
+## Technologies Used
+- Python with asyncio
+- Selenium WebDriver
+- PyQt5 for GUI
+- MySQL for data storage
+- Redis for caching`
+          },
+          'revautosale.md': {
+            type: 'file',
+            content: `# RevAutoSale Backend API
+**Status:** LIVE | **Tech:** Django, MySQL, Scrapy, REST Framework
+
+## Overview
+Enterprise-grade inventory management API serving 100k+ vehicle records.
+
+## Key Features
+- RESTful API design
+- Sub-100ms response times
+- Automated data cleaning
+- Real-time synchronization
+- Comprehensive documentation
+
+## Architecture
+- Django REST Framework
+- MySQL with optimized indexes
+- Redis for caching
+- Celery for background tasks
+- AWS deployment
+
+## Performance
+- 100k+ vehicle records managed
+- 500+ API requests per minute
+- 99.9% uptime maintained
+- Zero security incidents
+
+## API Endpoints
+- GET /api/vehicles/
+- POST /api/vehicles/
+- PUT /api/vehicles/{id}/
+- DELETE /api/vehicles/{id}/
+- GET /api/search/?q={query}`
+          }
+        }
+      },
+      'skills': {
+        type: 'directory',
+        files: {
+          'languages.txt': {
+            type: 'file',
+            content: `PROGRAMMING LANGUAGES
+====================
+
+Python        [████████░░] 85%
+JavaScript    [████████░░] 80%
+TypeScript    [███████░░░] 75%
+Java          [██████░░░░] 70%
+SQL           [████████░░] 80%
+
+DETAILS:
+--------
+Python: Web scraping, automation, Django, Flask, FastAPI
+JavaScript: React, Node.js, Express, vanilla JS
+TypeScript: Type-safe React apps, API development
+Java: Object-oriented programming, Spring basics
+SQL: MySQL, PostgreSQL, complex queries, optimization`
+          },
+          'frameworks.txt': {
+            type: 'file',
+            content: `FRAMEWORKS & TOOLS
+==================
+
+Frontend:
+- React.js (Advanced)
+- Next.js (Advanced)
+- Tailwind CSS (Expert)
+- Material-UI (Intermediate)
+- HTML5/CSS3 (Expert)
+
+Backend:
+- Node.js + Express (Advanced)
+- Django (Advanced)
+- Flask (Intermediate)
+- FastAPI (Intermediate)
+
+Data & Automation:
+- Scrapy (Expert)
+- Selenium (Advanced)
+- Pandas (Advanced)
+- BeautifulSoup (Expert)
+
+Cloud & DevOps:
+- AWS (EC2, S3, App Runner)
+- Docker (Intermediate)
+- Firebase (Intermediate)
+- Git/GitHub (Advanced)`
+          },
+          'databases.txt': {
+            type: 'file',
+            content: `DATABASE TECHNOLOGIES
+====================
+
+Relational:
+- MySQL (Advanced)
+- PostgreSQL (Intermediate)
+- SQLite (Advanced)
+
+NoSQL:
+- MongoDB (Advanced)
+- Redis (Intermediate)
+- Firebase Firestore (Basic)
+
+Skills:
+- Database design and optimization
+- Complex query writing
+- Index optimization
+- Data migration
+- Backup and recovery
+- Performance tuning`
+          }
+        }
+      }
+    }
+  }
+};
 
 export default function Terminal() {
   const [history, setHistory] = useState<Array<{ type: "command" | "output"; content: string }>>([
@@ -263,6 +560,10 @@ export default function Terminal() {
   const [currentInput, setCurrentInput] = useState("")
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
+  const [currentDir, setCurrentDir] = useState('/')
+  const [gitData, setGitData] = useState<any>(null)
+  const [gameState, setGameState] = useState<any>(null)
+  const [gameMode, setGameMode] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -272,6 +573,29 @@ export default function Terminal() {
     }
   }, [history])
 
+  // Fetch GitHub data
+  const fetchGitHubData = async () => {
+    try {
+      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
+        fetch('https://api.github.com/users/ahsanriaz786'),
+        fetch('https://api.github.com/users/ahsanriaz786/repos?sort=updated&per_page=10'),
+        fetch('https://api.github.com/users/ahsanriaz786/events?per_page=10')
+      ]);
+
+      const user = await userResponse.json();
+      const repos = await reposResponse.json();
+      const events = await eventsResponse.json();
+
+      setGitData({ user, repos, events });
+    } catch (error) {
+      console.error('Failed to fetch GitHub data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchGitHubData();
+  }, [])
+
   const downloadResume = () => {
     const link = document.createElement('a')
     link.href = '/Ahsan Riaz - Resume.pdf'
@@ -279,30 +603,594 @@ export default function Terminal() {
     link.click()
   }
 
-  const handleCommand = (cmd: string) => {
-    const trimmedCmd = cmd.trim().toLowerCase()
+  const getFileContent = (path: string, filename: string): string => {
+    const dirs = path.split('/').filter(Boolean);
+    let current = fileSystem['/'];
+    
+    for (const dir of dirs) {
+      if (current.files && current.files[dir] && current.files[dir].type === 'directory') {
+        current = current.files[dir] as any;
+      }
+    }
+    
+    if (current.files && current.files[filename]) {
+      const file = current.files[filename];
+      if (file.type === 'file') {
+        // Special handling for resume.pdf
+        if (filename === 'resume.pdf') {
+          return commands["cat resume.pdf"];
+        }
+        return file.content;
+      } else {
+        return `cat: ${filename}: Is a directory`;
+      }
+    }
+    
+    return `cat: ${filename}: No such file or directory`;
+  };
 
-    // Add command to history
-    setHistory((prev) => [...prev, { type: "command", content: `riaz@portfolio:~$ ${cmd}` }])
+  const changeDirectory = (currentPath: string, targetDir: string): { newPath: string; error?: string } => {
+    if (targetDir === '..') {
+      const parts = currentPath.split('/').filter(Boolean);
+      if (parts.length === 0) return { newPath: '/' };
+      parts.pop();
+      return { newPath: '/' + parts.join('/') };
+    }
+    
+    if (targetDir === '/' || targetDir === '~') {
+      return { newPath: '/' };
+    }
+    
+    const dirs = currentPath.split('/').filter(Boolean);
+    let current = fileSystem['/'];
+    
+    for (const dir of dirs) {
+      if (current.files && current.files[dir] && current.files[dir].type === 'directory') {
+        current = current.files[dir] as any;
+      }
+    }
+    
+    if (current.files && current.files[targetDir] && current.files[targetDir].type === 'directory') {
+      const newPath = currentPath === '/' ? `/${targetDir}` : `${currentPath}/${targetDir}`;
+      return { newPath };
+    }
+    
+    return { newPath: currentPath, error: `cd: ${targetDir}: No such file or directory` };
+  };
+
+  const getGitStatus = () => {
+    if (!gitData) {
+      return `Fetching git status...
+>> Connecting to GitHub API...
+>> Please wait while we sync with remote repository...`;
+    }
+
+    const { user, repos } = gitData;
+    const mainRepo = repos.find((repo: any) => repo.name === 'riazos-portfolio') || repos[0];
+    
+    return `On branch main
+Your branch is up to date with 'origin/main'.
+
+Repository: ${mainRepo?.name || 'riazos-portfolio'}
+Remote: ${mainRepo?.html_url || 'https://github.com/ahsanriaz786/riazos-portfolio'}
+Last updated: ${mainRepo ? new Date(mainRepo.updated_at).toLocaleString() : 'Recently'}
+
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+  
+    modified:   components/terminal.tsx
+    modified:   components/desktop.tsx
+    new file:   public/Ahsan Riaz - Resume.pdf
+
+Public repositories: ${user?.public_repos || 0}
+Total commits this year: ${user?.contributions || 'Loading...'}
+Profile views: ${user?.followers || 0} followers
+
+nothing to commit, working tree clean`;
+  };
+
+  const getGitLog = () => {
+    if (!gitData) {
+      return `Loading commit history...
+>> Fetching recent commits from GitHub...`;
+    }
+
+    const { events } = gitData;
+    const pushEvents = events.filter((event: any) => event.type === 'PushEvent').slice(0, 10);
+    
+    if (pushEvents.length === 0) {
+      return `No recent push events found.
+Run 'git activity' to see all GitHub activity.`;
+    }
+
+    let output = `Recent commits:\n\n`;
+    
+    pushEvents.forEach((event: any, index: number) => {
+      const date = new Date(event.created_at);
+      const shortSha = Math.random().toString(36).substring(2, 9); // Mock SHA
+      const repo = event.repo.name.split('/')[1];
+      const commits = event.payload.commits || [];
+      const message = commits[0]?.message || 'Portfolio updates';
+      
+      output += `${shortSha} ${message} (${repo}) - ${date.toLocaleDateString()}\n`;
+    });
+
+    return output.trim();
+  };
+
+  const getGitBranches = () => {
+    if (!gitData) {
+      return `Loading branches...
+>> Connecting to repository...`;
+    }
+
+    const { repos } = gitData;
+    const mainRepo = repos.find((repo: any) => repo.name === 'riazos-portfolio') || repos[0];
+    
+    return `Active branches:
+
+* main                    ${mainRepo ? new Date(mainRepo.updated_at).toLocaleDateString() : 'Current'}
+  feat/resume            [Recently merged]
+  feat/terminal-upgrade  [In development]
+  feat/matrix-background [Deployed]
+  
+Current branch: main
+Default branch: main
+Total repositories: ${repos.length}
+
+Tip: Use 'git activity' to see recent development activity`;
+  };
+
+  const getGitActivity = () => {
+    if (!gitData) {
+      return `Loading GitHub activity...
+>> Fetching real-time data from GitHub API...`;
+    }
+
+    const { events, user } = gitData;
+    
+    let output = `Recent GitHub Activity (Live from API):\n\n`;
+    output += `Profile: ${user.login} (${user.name})\n`;
+    output += `Public repos: ${user.public_repos} | Followers: ${user.followers}\n`;
+    output += `Account created: ${new Date(user.created_at).toLocaleDateString()}\n\n`;
+    
+    output += `Latest Events:\n`;
+    output += `${'='.repeat(50)}\n`;
+    
+    events.slice(0, 8).forEach((event: any) => {
+      const date = new Date(event.created_at);
+      const timeAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60));
+      const repo = event.repo.name.split('/')[1];
+      
+      switch (event.type) {
+        case 'PushEvent':
+          const commits = event.payload.commits?.length || 1;
+          output += `[PUSH] ${commits} commit(s) to ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'CreateEvent':
+          output += `[CREATE] ${event.payload.ref_type} in ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'WatchEvent':
+          output += `[STAR] Starred ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'IssuesEvent':
+          output += `[ISSUE] ${event.payload.action} issue in ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'PullRequestEvent':
+          output += `[PR] ${event.payload.action} PR in ${repo} (${timeAgo}h ago)\n`;
+          break;
+        default:
+          output += `[${event.type.replace('Event', '').toUpperCase()}] ${repo} (${timeAgo}h ago)\n`;
+      }
+    });
+    
+    output += `\n>> This data is fetched live from GitHub API!`;
+    output += `\n>> Last updated: ${new Date().toLocaleString()}`;
+    
+    return output;
+  };
+
+  // Game Functions
+  const getGamesList = () => {
+    return `TERMINAL GAMES - Easter Eggs Collection
+
+Available Games:
+================
+
+[1] snake           ASCII Snake Game
+                    Use WASD or arrow keys to move
+                    Eat food to grow, avoid walls!
+                    
+[2] guess          Number Guessing Game  
+                    I think of a number, you guess it
+                    Uses your coding logic skills
+                    
+[3] hack           Hacker Simulator
+                    Pretend to hack the mainframe
+                    Pure fun and nostalgia
+
+Usage: Type the game name to start (e.g., 'snake')
+Type 'exit' during any game to return to terminal
+
+>> Pro tip: These games showcase interactive terminal programming!`;
+  };
+
+  const startSnakeGame = () => {
+    const initialSnake = [{ x: 10, y: 10 }];
+    const initialFood = { x: 15, y: 15 };
+    
+    setGameMode('snake');
+    setGameState({
+      snake: initialSnake,
+      food: initialFood,
+      direction: 'RIGHT',
+      score: 0,
+      gameOver: false,
+      width: 30,
+      height: 20
+    });
+
+    return `SNAKE GAME STARTED!
+    
+┌${'─'.repeat(32)}┐
+│  Use WASD to move the snake    │
+│  Eat the food (@) to grow      │
+│  Avoid hitting walls or self   │  
+│  Type 'exit' to quit game      │
+└${'─'.repeat(32)}┘
+
+Press any WASD key to begin...`;
+  };
+
+  const renderSnakeGame = () => {
+    if (!gameState || gameMode !== 'snake') return '';
+    
+    const { snake, food, score, gameOver, width, height } = gameState;
+    
+    if (gameOver) {
+      return `GAME OVER!
+
+Final Score: ${score}
+Length: ${snake.length}
+
+Type 'snake' to play again or 'exit' to return to terminal.`;
+    }
+
+    // Create game board
+    let board = [];
+    for (let y = 0; y < height; y++) {
+      let row = [];
+      for (let x = 0; x < width; x++) {
+        if (snake.some((segment: any) => segment.x === x && segment.y === y)) {
+          row.push(snake[0].x === x && snake[0].y === y ? 'O' : 'o');
+        } else if (food.x === x && food.y === y) {
+          row.push('@');
+        } else {
+          row.push(' ');
+        }
+      }
+      board.push(row);
+    }
+
+    let output = `SNAKE GAME - Score: ${score}\n\n`;
+    output += '┌' + '─'.repeat(width) + '┐\n';
+    for (let row of board) {
+      output += '│' + row.join('') + '│\n';
+    }
+    output += '└' + '─'.repeat(width) + '┘\n';
+    output += '\nUse WASD to move | Type "exit" to quit';
+    
+    return output;
+  };
+
+  const updateSnakeGame = (direction: string) => {
+    if (!gameState || gameMode !== 'snake' || gameState.gameOver) return;
+
+    const { snake, food, score, width, height } = gameState;
+    const head = { ...snake[0] };
+
+    // Update direction
+    switch (direction.toUpperCase()) {
+      case 'W': head.y -= 1; break;
+      case 'S': head.y += 1; break;
+      case 'A': head.x -= 1; break;
+      case 'D': head.x += 1; break;
+      default: return;
+    }
+
+    // Check wall collision
+    if (head.x < 0 || head.x >= width || head.y < 0 || head.y >= height) {
+      setGameState({ ...gameState, gameOver: true });
+      return;
+    }
+
+    // Check self collision
+    if (snake.some((segment: any) => segment.x === head.x && segment.y === head.y)) {
+      setGameState({ ...gameState, gameOver: true });
+      return;
+    }
+
+    const newSnake = [head, ...snake];
+    let newFood = food;
+    let newScore = score;
+
+    // Check food collision
+    if (head.x === food.x && head.y === food.y) {
+      newScore += 10;
+      // Generate new food
+      do {
+        newFood = {
+          x: Math.floor(Math.random() * width),
+          y: Math.floor(Math.random() * height)
+        };
+      } while (newSnake.some((segment: any) => segment.x === newFood.x && segment.y === newFood.y));
+    } else {
+      newSnake.pop(); // Remove tail if no food eaten
+    }
+
+    setGameState({
+      ...gameState,
+      snake: newSnake,
+      food: newFood,
+      score: newScore,
+      direction
+    });
+  };
+
+  const startGuessingGame = () => {
+    const targetNumber = Math.floor(Math.random() * 100) + 1;
+    setGameMode('guess');
+    setGameState({
+      target: targetNumber,
+      attempts: 0,
+      guesses: [],
+      gameOver: false
+    });
+
+    return `NUMBER GUESSING GAME
+    
+┌─────────────────────────────────────┐
+│  I'm thinking of a number 1-100     │
+│  Can you guess it?                  │
+│                                     │
+│  Hints: I'll tell you if your       │
+│  guess is too high or too low       │
+│                                     │
+│  Type your guess or 'exit' to quit  │
+└─────────────────────────────────────┘
+
+Enter your first guess:`;
+  };
+
+  const processGuess = (guess: string) => {
+    if (!gameState || gameMode !== 'guess') return '';
+    
+    const num = parseInt(guess);
+    if (isNaN(num) || num < 1 || num > 100) {
+      return 'Please enter a number between 1 and 100!';
+    }
+
+    const { target, attempts, guesses } = gameState;
+    const newAttempts = attempts + 1;
+    const newGuesses = [...guesses, num];
+
+    if (num === target) {
+      setGameState({ ...gameState, gameOver: true, attempts: newAttempts });
+      return `[SUCCESS] CONGRATULATIONS! [SUCCESS]
+
+You guessed it! The number was ${target}
+Attempts: ${newAttempts}
+Your guesses: ${newGuesses.join(', ')}
+
+${newAttempts <= 3 ? 'Incredible! You\'re a mind reader!' :
+  newAttempts <= 7 ? 'Great job! Nice logical thinking!' :
+  newAttempts <= 10 ? 'Good work! You got there!' :
+  'You found it! Persistence pays off!'}
+
+Type 'guess' to play again or 'exit' to return.`;
+    }
+
+    setGameState({
+      ...gameState,
+      attempts: newAttempts,
+      guesses: newGuesses
+    });
+
+    const hint = num < target ? 'TOO LOW' : 'TOO HIGH';
+    return `Guess ${newAttempts}: ${num} - ${hint}
+
+Attempts so far: ${newAttempts}
+Your guesses: ${newGuesses.join(', ')}
+
+Enter your next guess:`;
+  };
+
+  const startHackSimulator = () => {
+    const hackerSequence = [
+      'Initializing connection...',
+      'Bypassing firewall...',
+      'Scanning for vulnerabilities...',
+      'Injecting payload...',
+      'Escalating privileges...',
+      'Accessing mainframe...',
+      'Downloading classified files...',
+      'Covering tracks...',
+      'Connection terminated.',
+      '',
+      'HACK COMPLETE!',
+      '>> All your base are belong to us <<'
+    ];
+
+    let output = `HACKER SIMULATOR v2.0
+    
+┌─────────────────────────────────────┐
+│  WARNING: For educational purposes  │
+│  This is just for fun! :)           │
+└─────────────────────────────────────┘
+
+Initiating hack sequence...
+
+`;
+
+    hackerSequence.forEach((line, index) => {
+      if (line === '') {
+        output += '\n';
+      } else if (line === 'HACK COMPLETE!') {
+        output += `[SUCCESS] ${line}\n`;
+      } else if (line.includes('>>')) {
+        output += `${line}\n`;
+      } else {
+        output += `[${String(index + 1).padStart(2, '0')}] ${line}\n`;
+      }
+    });
+
+    output += '\n>> Remember: With great power comes great responsibility!';
+    output += '\n>> Type any other command to return to normal terminal.';
+
+    return output;
+  };
+
+  const handleCommand = (cmd: string) => {
+    const parts = cmd.trim().split(' ');
+    const command = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    // Add command to history with current directory
+    const prompt = `riaz@portfolio:${currentDir === '/' ? '~' : currentDir}$`;
+    setHistory((prev) => [...prev, { type: "command", content: `${prompt} ${cmd}` }])
     setCommandHistory((prev) => [...prev, cmd])
     setHistoryIndex(-1)
 
+    // Handle game inputs
+    if (gameMode === 'snake') {
+      if (command === 'exit') {
+        setGameMode(null);
+        setGameState(null);
+        setHistory(prev => [...prev, { type: 'output', content: 'Game exited. Returning to terminal.' }]);
+        return;
+      }
+      if (['w', 'a', 's', 'd'].includes(command)) {
+        updateSnakeGame(command);
+        setHistory(prev => [...prev, { type: 'output', content: renderSnakeGame() }]);
+        return;
+      }
+      setHistory(prev => [...prev, { type: 'output', content: renderSnakeGame() }]);
+      return;
+    }
+
+    if (gameMode === 'guess' && !gameState?.gameOver) {
+      if (command === 'exit') {
+        setGameMode(null);
+        setGameState(null);
+        setHistory(prev => [...prev, { type: 'output', content: 'Game exited. Returning to terminal.' }]);
+        return;
+      }
+      const result = processGuess(cmd.trim());
+      setHistory(prev => [...prev, { type: 'output', content: result }]);
+      return;
+    }
+
     // Handle special commands
-    if (trimmedCmd === "clear") {
+    if (command === "clear") {
       setHistory([])
       return
     }
 
+    if (command === "pwd") {
+      setHistory((prev) => [...prev, { type: "output", content: currentDir }])
+      return
+    }
+
+    if (command === "ls") {
+      const output = commands.ls(currentDir);
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
+    if (command === "cd") {
+      const targetDir = args[0] || '/';
+      const result = changeDirectory(currentDir, targetDir);
+      if (result.error) {
+        setHistory((prev) => [...prev, { type: "output", content: result.error }])
+      } else {
+        setCurrentDir(result.newPath);
+      }
+      return
+    }
+
+    if (command === "cat") {
+      const filename = args[0];
+      if (!filename) {
+        setHistory((prev) => [...prev, { type: "output", content: "cat: missing file operand" }])
+        return
+      }
+      const content = getFileContent(currentDir, filename);
+      setHistory((prev) => [...prev, { type: "output", content: content }])
+      return
+    }
+
+    // Handle git commands
+    if (command === "git") {
+      const subCommand = args[0];
+      let output = "";
+      
+      switch (subCommand) {
+        case "status":
+          output = getGitStatus();
+          break;
+        case "log":
+          output = getGitLog();
+          break;
+        case "branch":
+          output = getGitBranches();
+          break;
+        case "activity":
+          output = getGitActivity();
+          break;
+        default:
+          output = `git: '${subCommand}' is not a git command. Available: status, log, branch, activity`;
+      }
+      
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
     // Handle resume download commands
-    if (trimmedCmd === "resume" || trimmedCmd === "download-resume") {
+    if (command === "resume" || command === "download-resume") {
       downloadResume()
     }
 
-    // Check if command exists
+    // Handle game commands
+    if (command === "games") {
+      setHistory((prev) => [...prev, { type: "output", content: getGamesList() }])
+      return
+    }
+
+    if (command === "snake") {
+      const output = startSnakeGame();
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
+    if (command === "guess") {
+      const output = startGuessingGame();
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
+    if (command === "hack") {
+      const output = startHackSimulator();
+      setHistory((prev) => [...prev, { type: "output", content: output }])
+      return
+    }
+
+
+
+    // Check if command exists in static commands
+    const staticCommand = cmd.trim().toLowerCase();
     const output =
-      commands[trimmedCmd as keyof typeof commands] ||
-      commands[cmd.trim() as keyof typeof commands] ||
-      `Command not found: ${cmd}. Type 'help' for available commands.`
+      commands[staticCommand as keyof typeof commands] ||
+      `Command not found: ${command}. Type 'help' for available commands.`
 
     setHistory((prev) => [...prev, { type: "output", content: output }])
   }
@@ -349,7 +1237,7 @@ export default function Terminal() {
 
         {/* Current input line */}
         <div className="flex items-center">
-          <span className="text-[#00FF41] mr-2">riaz@portfolio:~$</span>
+          <span className="text-[#00FF41] mr-2">riaz@portfolio:{currentDir === '/' ? '~' : currentDir}$</span>
           <input
             ref={inputRef}
             type="text"
