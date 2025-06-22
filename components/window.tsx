@@ -59,7 +59,7 @@ export default function Window({ title, children, isActive, onClose, onFocus }: 
   return (
     <div
       ref={windowRef}
-      className={`fixed bg-[#141414] bg-opacity-95 backdrop-blur-sm border rounded-lg shadow-2xl transition-all duration-300 ${
+      className={`fixed bg-[#141414] bg-opacity-95 backdrop-blur-sm border rounded-lg shadow-2xl transition-all duration-300 overflow-hidden ${
         isActive ? "border-[#00FF41] shadow-[#00FF41]/20" : "border-gray-600 shadow-gray-900/50"
       }`}
       style={{
@@ -87,7 +87,7 @@ export default function Window({ title, children, isActive, onClose, onFocus }: 
       </div>
 
       {/* Window Content */}
-      <div className="p-4 h-full overflow-auto">{children}</div>
+      <div className="p-4 h-[calc(100%-60px)] overflow-auto">{children}</div>
     </div>
   )
 }
