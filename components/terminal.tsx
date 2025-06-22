@@ -23,6 +23,10 @@ ls                    - List directory contents
 cat [filename]        - Display file contents
 cd [directory]        - Change directory
 pwd                   - Show current directory
+git status            - Show portfolio git status
+git log               - Show recent commits
+git branch            - Show active branches
+git activity          - Show recent GitHub activity
 easter_egg            - Find the hidden surprise`,
 
   about: `NAME: Ahsan Riaz
@@ -553,6 +557,7 @@ export default function Terminal() {
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [currentDir, setCurrentDir] = useState('/')
+  const [gitData, setGitData] = useState<any>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -561,6 +566,29 @@ export default function Terminal() {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight
     }
   }, [history])
+
+  // Fetch GitHub data
+  const fetchGitHubData = async () => {
+    try {
+      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
+        fetch('https://api.github.com/users/ahsanriaz786'),
+        fetch('https://api.github.com/users/ahsanriaz786/repos?sort=updated&per_page=10'),
+        fetch('https://api.github.com/users/ahsanriaz786/events?per_page=10')
+      ]);
+
+      const user = await userResponse.json();
+      const repos = await reposResponse.json();
+      const events = await eventsResponse.json();
+
+      setGitData({ user, repos, events });
+    } catch (error) {
+      console.error('Failed to fetch GitHub data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchGitHubData();
+  }, [])
 
   const downloadResume = () => {
     const link = document.createElement('a')
@@ -624,6 +652,138 @@ export default function Terminal() {
     return { newPath: currentPath, error: `cd: ${targetDir}: No such file or directory` };
   };
 
+  const getGitStatus = () => {
+    if (!gitData) {
+      return `Fetching git status...
+>> Connecting to GitHub API...
+>> Please wait while we sync with remote repository...`;
+    }
+
+    const { user, repos } = gitData;
+    const mainRepo = repos.find((repo: any) => repo.name === 'riazos-portfolio') || repos[0];
+    
+    return `On branch main
+Your branch is up to date with 'origin/main'.
+
+Repository: ${mainRepo?.name || 'riazos-portfolio'}
+Remote: ${mainRepo?.html_url || 'https://github.com/ahsanriaz786/riazos-portfolio'}
+Last updated: ${mainRepo ? new Date(mainRepo.updated_at).toLocaleString() : 'Recently'}
+
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+  
+    modified:   components/terminal.tsx
+    modified:   components/desktop.tsx
+    new file:   public/Ahsan Riaz - Resume.pdf
+
+Public repositories: ${user?.public_repos || 0}
+Total commits this year: ${user?.contributions || 'Loading...'}
+Profile views: ${user?.followers || 0} followers
+
+nothing to commit, working tree clean`;
+  };
+
+  const getGitLog = () => {
+    if (!gitData) {
+      return `Loading commit history...
+>> Fetching recent commits from GitHub...`;
+    }
+
+    const { events } = gitData;
+    const pushEvents = events.filter((event: any) => event.type === 'PushEvent').slice(0, 10);
+    
+    if (pushEvents.length === 0) {
+      return `No recent push events found.
+Run 'git activity' to see all GitHub activity.`;
+    }
+
+    let output = `Recent commits:\n\n`;
+    
+    pushEvents.forEach((event: any, index: number) => {
+      const date = new Date(event.created_at);
+      const shortSha = Math.random().toString(36).substring(2, 9); // Mock SHA
+      const repo = event.repo.name.split('/')[1];
+      const commits = event.payload.commits || [];
+      const message = commits[0]?.message || 'Portfolio updates';
+      
+      output += `${shortSha} ${message} (${repo}) - ${date.toLocaleDateString()}\n`;
+    });
+
+    return output.trim();
+  };
+
+  const getGitBranches = () => {
+    if (!gitData) {
+      return `Loading branches...
+>> Connecting to repository...`;
+    }
+
+    const { repos } = gitData;
+    const mainRepo = repos.find((repo: any) => repo.name === 'riazos-portfolio') || repos[0];
+    
+    return `Active branches:
+
+* main                    ${mainRepo ? new Date(mainRepo.updated_at).toLocaleDateString() : 'Current'}
+  feat/resume            [Recently merged]
+  feat/terminal-upgrade  [In development]
+  feat/matrix-background [Deployed]
+  
+Current branch: main
+Default branch: main
+Total repositories: ${repos.length}
+
+Tip: Use 'git activity' to see recent development activity`;
+  };
+
+  const getGitActivity = () => {
+    if (!gitData) {
+      return `Loading GitHub activity...
+>> Fetching real-time data from GitHub API...`;
+    }
+
+    const { events, user } = gitData;
+    
+    let output = `Recent GitHub Activity (Live from API):\n\n`;
+    output += `Profile: ${user.login} (${user.name})\n`;
+    output += `Public repos: ${user.public_repos} | Followers: ${user.followers}\n`;
+    output += `Account created: ${new Date(user.created_at).toLocaleDateString()}\n\n`;
+    
+    output += `Latest Events:\n`;
+    output += `${'='.repeat(50)}\n`;
+    
+    events.slice(0, 8).forEach((event: any) => {
+      const date = new Date(event.created_at);
+      const timeAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60));
+      const repo = event.repo.name.split('/')[1];
+      
+      switch (event.type) {
+        case 'PushEvent':
+          const commits = event.payload.commits?.length || 1;
+          output += `[PUSH] ${commits} commit(s) to ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'CreateEvent':
+          output += `[CREATE] ${event.payload.ref_type} in ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'WatchEvent':
+          output += `[STAR] Starred ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'IssuesEvent':
+          output += `[ISSUE] ${event.payload.action} issue in ${repo} (${timeAgo}h ago)\n`;
+          break;
+        case 'PullRequestEvent':
+          output += `[PR] ${event.payload.action} PR in ${repo} (${timeAgo}h ago)\n`;
+          break;
+        default:
+          output += `[${event.type.replace('Event', '').toUpperCase()}] ${repo} (${timeAgo}h ago)\n`;
+      }
+    });
+    
+    output += `\n>> This data is fetched live from GitHub API!`;
+    output += `\n>> Last updated: ${new Date().toLocaleString()}`;
+    
+    return output;
+  };
+
   const handleCommand = (cmd: string) => {
     const parts = cmd.trim().split(' ');
     const command = parts[0].toLowerCase();
@@ -671,6 +831,32 @@ export default function Terminal() {
       }
       const content = getFileContent(currentDir, filename);
       setHistory((prev) => [...prev, { type: "output", content: content }])
+      return
+    }
+
+    // Handle git commands
+    if (command === "git") {
+      const subCommand = args[0];
+      let output = "";
+      
+      switch (subCommand) {
+        case "status":
+          output = getGitStatus();
+          break;
+        case "log":
+          output = getGitLog();
+          break;
+        case "branch":
+          output = getGitBranches();
+          break;
+        case "activity":
+          output = getGitActivity();
+          break;
+        default:
+          output = `git: '${subCommand}' is not a git command. Available: status, log, branch, activity`;
+      }
+      
+      setHistory((prev) => [...prev, { type: "output", content: output }])
       return
     }
 
