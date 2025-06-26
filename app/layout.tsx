@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Fira_Code, Roboto_Mono } from "next/font/google"
+import { Analytics } from '@vercel/analytics/react'
 import "./globals.css"
 
 const firaCode = Fira_Code({
@@ -36,7 +37,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${firaCode.variable} ${robotoMono.variable}`}>
-      <body className={`${firaCode.className} antialiased`}>{children}</body>
+      <body className={`${firaCode.className} antialiased`}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
