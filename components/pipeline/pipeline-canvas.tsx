@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import {
   ReactFlow,
   Background,
@@ -16,23 +16,42 @@ import '@xyflow/react/dist/style.css'
 
 import { getInitialNodes, getInitialEdges } from '@/lib/pipeline/graph'
 import type { PipelineNode, PipelineEdge } from '@/lib/pipeline/types'
+import { PipelineProvider, usePipelineContext } from '@/lib/pipeline/context'
 import { CanvasNoise } from './canvas-noise'
 import { CanvasSpotlight } from './canvas-spotlight'
+import { SrFallback } from './sr-fallback'
+import { TriggerNodeComponent } from './nodes/trigger-node'
+import { ProjectNodeComponent } from './nodes/project-node'
+import { SkillNodeComponent } from './nodes/skill-node'
+import { AgentNodeComponent } from './nodes/agent-node'
+import { ContactNodeComponent } from './nodes/contact-node'
+import { FlowEdge } from './edges/flow-edge'
 
 // Node and edge type maps -- defined outside the component so references are stable.
-// Phase 0: empty maps (React Flow renders default nodes). Phase 1 adds custom types here.
-const nodeTypes = {} as const
-const edgeTypes = {} as const
+// React Flow does reference equality on these; inline objects would remount all nodes on
+// every render. Keep these at module scope.
+const nodeTypes = {
+  trigger: TriggerNodeComponent,
+  project: ProjectNodeComponent,
+  skill: SkillNodeComponent,
+  agent: AgentNodeComponent,
+  contact: ContactNodeComponent,
+} as const
 
-export function PipelineCanvas() {
-  const [nodes, setNodes, onNodesChange] = useNodesState<PipelineNode>(
-    getInitialNodes()
-  )
+// Both edge kinds (pipeline solid, capability dashed) use the same FlowEdge renderer.
+// The edge's `data.kind` field controls the visual variant.
+const edgeTypes = {
+  pipeline: FlowEdge,
+  capability: FlowEdge,
+} as const
+
+function PipelineCanvasInner() {
+  const { setWiredByUser, wiredByUser } = usePipelineContext()
+
+  const [nodes, , onNodesChange] = useNodesState<PipelineNode>(getInitialNodes())
   const [edges, setEdges, onEdgesChange] = useEdgesState<PipelineEdge>(
     getInitialEdges()
   )
-
-  const [wiredByUser, setWiredByUser] = useState(false)
 
   const onConnect = useCallback(
     (connection: Connection) => {
@@ -50,7 +69,7 @@ export function PipelineCanvas() {
         setWiredByUser(true)
       }
     },
-    [setEdges, wiredByUser]
+    [setEdges, wiredByUser, setWiredByUser]
   )
 
   return (
@@ -58,6 +77,9 @@ export function PipelineCanvas() {
       className="relative h-screen w-full"
       style={{ background: '#0e0e11' }}
     >
+      {/* Screen reader text fallback -- visually hidden, full semantic content */}
+      <SrFallback />
+
       {/* Depth layers rendered beneath the flow */}
       <CanvasSpotlight />
       <CanvasNoise />
@@ -104,5 +126,13 @@ export function PipelineCanvas() {
         />
       </ReactFlow>
     </div>
+  )
+}
+
+export function PipelineCanvas() {
+  return (
+    <PipelineProvider>
+      <PipelineCanvasInner />
+    </PipelineProvider>
   )
 }
