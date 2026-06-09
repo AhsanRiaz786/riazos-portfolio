@@ -26,6 +26,8 @@ import { SkillNodeComponent } from './nodes/skill-node'
 import { AgentNodeComponent } from './nodes/agent-node'
 import { ContactNodeComponent } from './nodes/contact-node'
 import { FlowEdge } from './edges/flow-edge'
+import { TourController } from './tour/tour-controller'
+import { TourNarration } from './tour/tour-narration'
 
 // Node and edge type maps -- defined outside the component so references are stable.
 // React Flow does reference equality on these; inline objects would remount all nodes on
@@ -46,7 +48,7 @@ const edgeTypes = {
 } as const
 
 function PipelineCanvasInner() {
-  const { setWiredByUser, wiredByUser } = usePipelineContext()
+  const { setWiredByUser, wiredByUser, setActiveNodeId } = usePipelineContext()
 
   const [nodes, , onNodesChange] = useNodesState<PipelineNode>(getInitialNodes())
   const [edges, setEdges, onEdgesChange] = useEdgesState<PipelineEdge>(
@@ -55,21 +57,22 @@ function PipelineCanvasInner() {
 
   const onConnect = useCallback(
     (connection: Connection) => {
+      // Fire a packet on the newly wired edge immediately
       setEdges((eds) =>
         addEdge(
           {
             ...connection,
             type: 'pipeline',
-            data: { kind: 'pipeline' as const, executing: false, packetKey: 0 },
+            data: { kind: 'pipeline' as const, executing: true, packetKey: 1 },
           },
           eds
         )
       )
-      if (!wiredByUser) {
-        setWiredByUser(true)
-      }
+      if (!wiredByUser) setWiredByUser(true)
+      // Expand the target node to reveal its detail panel
+      if (connection.target) setActiveNodeId(connection.target)
     },
-    [setEdges, wiredByUser, setWiredByUser]
+    [setEdges, wiredByUser, setWiredByUser, setActiveNodeId]
   )
 
   return (
@@ -124,7 +127,13 @@ function PipelineCanvasInner() {
             borderRadius: 8,
           }}
         />
+
+        {/* Tour sequencer -- inside ReactFlow so it can call useReactFlow() */}
+        <TourController />
       </ReactFlow>
+
+      {/* Narration overlay -- outside ReactFlow so it can be fixed-positioned */}
+      <TourNarration />
     </div>
   )
 }

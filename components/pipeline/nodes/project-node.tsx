@@ -7,7 +7,9 @@ import {
   useUpdateNodeInternals,
   type NodeProps,
 } from '@xyflow/react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import type { ProjectNode, ProjectTrack } from '@/lib/pipeline/types'
+import { usePipelineContext } from '@/lib/pipeline/context'
 
 // ---------------------------------------------------------------------------
 // Design tokens
@@ -51,11 +53,13 @@ export function ProjectNodeComponent({
 }: NodeProps<ProjectNode>) {
   const [expanded, setExpanded] = useState(false)
   const updateNodeInternals = useUpdateNodeInternals()
+  const prefersReduced = useReducedMotion()
+  const { activeNodeId } = usePipelineContext()
 
-  // Tell React Flow to re-measure this node whenever expand state changes
+  // Auto-expand when tour or wire-it-yourself selects this node
   useEffect(() => {
-    updateNodeInternals(id)
-  }, [expanded, id, updateNodeInternals])
+    if (activeNodeId === id) setExpanded(true)
+  }, [activeNodeId, id])
 
   const toggle = useCallback(() => setExpanded((v) => !v), [])
 
@@ -186,58 +190,74 @@ export function ProjectNodeComponent({
         )}
       </div>
 
-      {/* Expanded detail panel */}
-      {expanded && (
-        <div
-          style={{
-            borderTop: '1px solid rgba(255,255,255,0.07)',
-            padding: '12px 14px 12px 18px',
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Section label="PROBLEM" text={data.problem} />
-          <Section label="BUILT" text={data.built} />
-          {data.outcome && <Section label="OUTCOME" text={data.outcome} />}
-
-          {/* External links */}
-          {data.links.length > 0 && (
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
-              {data.links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    fontSize: 10,
-                    color: '#00FF41',
-                    border: '1px solid rgba(0,255,65,0.3)',
-                    borderRadius: 4,
-                    padding: '3px 8px',
-                    textDecoration: 'none',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  {link.label} &rarr;
-                </a>
-              ))}
-            </div>
-          )}
-
-          <p
-            style={{
-              color: 'rgba(255,255,255,0.15)',
-              fontSize: 9,
-              letterSpacing: '0.1em',
-              marginTop: 10,
-              textAlign: 'right',
-            }}
+      {/* Expanded detail panel -- animated with Framer Motion */}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            key="detail"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={
+              prefersReduced
+                ? { duration: 0 }
+                : { duration: 0.2, ease: 'easeInOut' }
+            }
+            style={{ overflow: 'hidden' }}
+            onAnimationComplete={() => updateNodeInternals(id)}
+            onClick={(e) => e.stopPropagation()}
           >
-            Esc to close
-          </p>
-        </div>
-      )}
+            <div
+              style={{
+                borderTop: '1px solid rgba(255,255,255,0.07)',
+                padding: '12px 14px 12px 18px',
+              }}
+            >
+              <Section label="PROBLEM" text={data.problem} />
+              <Section label="BUILT" text={data.built} />
+              {data.outcome && <Section label="OUTCOME" text={data.outcome} />}
+
+              {/* External links */}
+              {data.links.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+                  {data.links.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        fontSize: 10,
+                        color: '#00FF41',
+                        border: '1px solid rgba(0,255,65,0.3)',
+                        borderRadius: 4,
+                        padding: '3px 8px',
+                        textDecoration: 'none',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {link.label} &rarr;
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <p
+                style={{
+                  color: 'rgba(255,255,255,0.15)',
+                  fontSize: 9,
+                  letterSpacing: '0.1em',
+                  marginTop: 10,
+                  textAlign: 'right',
+                }}
+              >
+                Esc to close
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Handles -- three distinct ones to support two edge types */}
 

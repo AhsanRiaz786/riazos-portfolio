@@ -21,6 +21,11 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
     setTourStep((prev) => prev + 1)
   }, [])
 
+  const startTour = useCallback(() => {
+    setTourStep(0)
+    setTourState('running')
+  }, [])
+
   return (
     <PipelineContext.Provider
       value={{
@@ -28,6 +33,7 @@ export function PipelineProvider({ children }: { children: ReactNode }) {
         tourStep,
         setTourState,
         advanceTour,
+        startTour,
         wiredByUser,
         setWiredByUser,
         activeNodeId,

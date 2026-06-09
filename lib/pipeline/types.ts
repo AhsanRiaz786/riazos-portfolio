@@ -103,6 +103,8 @@ export type PipelineContextValue = {
   tourStep: number
   setTourState: (s: TourState) => void
   advanceTour: () => void
+  /** Reset step to 0 and set state to 'running' in one call */
+  startTour: () => void
 
   /** True after the visitor draws their first edge manually */
   wiredByUser: boolean
